@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.*
+
+# Build output
+dist/
+build/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Prisma
+prisma/migrations/
+# Keep schema.prisma and seed.ts!
+
+# Uploads (falls du lokale File-Uploads machst)
+uploads/
+temp/
+
+# TypeScript
+*.tsbuildinfo
