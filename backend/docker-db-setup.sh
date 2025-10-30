@@ -6,6 +6,7 @@ ROOT_PASSWORD=$(grep "^ROOT_PASSWORD" .env | cut -d "=" -f2)
 DATABASE=$(grep "^DATABASE" .env | cut -d "=" -f2)
 APP_USER=$(grep "^APP_USER" .env | cut -d "=" -f2)
 APP_PASSWORD=$(grep "^APP_PASSWORD" .env | cut -d "=" -f2)
+PORT=$(grep "^PORT" .env | cut -d "=" -f2)
 
 # container loop
 counter=0
@@ -32,7 +33,7 @@ while [ "$counter" -lt 3 ]; do
       -e POSTGRES_USER=$ROOT_USER \
       -e POSTGRES_DB=$DATABASE \
       -v postgres_data:/var/lib/postgresql/data \
-      -p 5432:5432 \
+      -p $PORT:5432 \
       postgres:17-alpine
     counter=$((counter + 1))
   fi
