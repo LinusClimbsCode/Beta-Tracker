@@ -36,3 +36,5 @@ temp/
 
 # TypeScript
 *.tsbuildinfo
+
+/src/generated/prisma
