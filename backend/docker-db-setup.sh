@@ -58,7 +58,7 @@ while [ $counter -lt 2 ]; do
   else
     echo "User does not exist"
     docker exec $CONTAINER_NAME psql -U $ROOT_USER -d $DATABASE -tAc "CREATE USER $APP_USER WITH PASSWORD '$APP_PASSWORD'"
-    docker exec $CONTAINER_NAME psql -U $ROOT_USER -d $DATABASE -tAc "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA public TO $APP_USER"
+    docker exec $CONTAINER_NAME psql -U $ROOT_USER -d $DATABASE -tAc "GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA ublic TO $APP_USER"
     counter=$((counter + 1))
   fi
 done
