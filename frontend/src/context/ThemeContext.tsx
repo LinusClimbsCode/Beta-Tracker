@@ -1,7 +1,7 @@
 // Theme context for managing light/dark/system modes
 // Syncs with localStorage and responds to system preference changes
 
-import { useState, useEffect, createContext } from "react";
+import { useState, useEffect, createContext, useContext } from "react";
 import type { ReactNode } from "react";
 
 
@@ -15,7 +15,7 @@ interface Props {
 }
 
 
-export const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
+const ThemeContext = createContext<ThemeContextType | undefined>(undefined)
 
 // Load theme from localStorage or default to system
 const initialState = (): Theme => {
@@ -70,3 +70,11 @@ export const ThemeContextProvider = ({ children }: Props) => {
   )
 }
 
+export const useTheme = (): ThemeContextType => {
+  const context = useContext(ThemeContext)
+
+  if (!context) {
+    throw new Error('UseThemeContext must be used with a ThemeContext')
+  }
+  return context
+}
