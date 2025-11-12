@@ -1,6 +1,8 @@
 import { useTheme } from "../context";
+import { useTranslation } from "react-i18next";
 
 export const ToggleThemeButton = () => {
+  const { t } = useTranslation()
   const { theme, setTheme } = useTheme()
 
   const onClick = () => {
@@ -17,7 +19,7 @@ export const ToggleThemeButton = () => {
 
   return (
     <button type="button" onClick={onClick}>
-      {theme}
+      {t(`theme.${theme}`)}
     </button>
   )
 }
