@@ -17,21 +17,21 @@ datasource db {
 
 // ========== ENUM ==========
 enum Role {
-  User
-  Moderator
-  Admin
+  user
+  moderator
+  admin
 }
 
 enum Level {
-  Newbie
-  Regular
-  HallenOG
+  newbie
+  regular
+  hallenOG
 }
 
 //TODO: change to model
 enum Language {
-  De
-  En
+  de
+  en
 }
 
 enum GradeSystemType {
@@ -111,16 +111,16 @@ model User {
   profilePicture      String?
   city                String
   favoriteGymId       String?
-  role                Role
+  role                Role                 @default(user)
   setter              Boolean              @default(false)
-  experiencePoints    Int
-  level               Level
-  trustPoints         Int
-  validationPower     Int
-  preferredLanguage   Language
-  darkModeEnabled     Boolean
-  profileVisibility   Boolean
-  emailVerified       Boolean
+  experiencePoints    Int                  @default(0)
+  level               Level                @default(newbie)
+  trustPoints         Int                  @default(0)
+  validationPower     Int                  @default(0)
+  preferredLanguage   Language             @default(en)
+  darkModeEnabled     Boolean              @default(false)
+  profileVisibility   Boolean              @default(true)
+  emailVerified       Boolean              @default(false)
   favoriteGym         Gym?                 @relation("favoriteByUsers", fields: [favoriteGymId], references: [id])
   setBoulders         Boulder[]            @relation("verifiedSetter")
   uploadedBoulders    Boulder[]            @relation("uploadedBy")
@@ -133,6 +133,7 @@ model User {
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   lastLoginAt         DateTime             @default(now())
+  RefreshToken        RefreshToken[]
 }
 
 model ModeratorGym {
@@ -319,4 +320,13 @@ model UserArchive {
   user                User              @relation(fields: [userId], references: [id])
   createdAt           DateTime          @default(now())
   updatedAt           DateTime          @updatedAt
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  expiresAt DateTime
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
 }
