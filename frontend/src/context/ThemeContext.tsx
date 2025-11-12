@@ -29,7 +29,6 @@ const initialState = (): Theme => {
 export const ThemeContextProvider = ({ children }: Props) => {
   const [theme, setTheme] = useState(initialState())
 
-  const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
   // Update dark class when system preference changes
   const handleMediaQueryChange = (event: MediaQueryListEvent) => {
@@ -42,6 +41,8 @@ export const ThemeContextProvider = ({ children }: Props) => {
 
   // Sync theme changes to localStorage and DOM
   useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+
     if (theme === 'system') {
       localStorage.removeItem('theme')
       mediaQuery.addEventListener('change', handleMediaQueryChange)
