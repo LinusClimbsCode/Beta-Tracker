@@ -4,7 +4,7 @@ node_modules/
 # Environment variables
 .env
 .env.*
-!*.env.example # is included
+!.env.example # is included
 
 # Build output
 dist/
