@@ -7,7 +7,7 @@ DATABASE=$(grep "^DATABASE" .env | cut -d "=" -f2)
 APP_USER=$(grep "^APP_USER" .env | cut -d "=" -f2)
 APP_PASSWORD=$(grep "^APP_PASSWORD" .env | cut -d "=" -f2)
 DOCKER_HOST=$(grep "^DOCKER_HOST" .env | cut -d "=" -f2)
-PORT=$(grep "^PORT" .env | cut -d "=" -f2)
+PORT=$(grep "^POSTGRES_PORT" .env | cut -d "=" -f2)
 
 # container loop
 counter=0
