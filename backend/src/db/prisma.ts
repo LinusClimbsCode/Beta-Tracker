@@ -1,12 +1,14 @@
-import { PrismaClient } from '../../node_modules/.prisma/generated/prisma/client';
+import { PrismaClient } from '@prisma/client';
+import { config } from '#config'
 
 declare global {
   var prisma: PrismaClient | undefined;
 }
 
+const nodeEnv = config.server.nodeEnv
 let prisma: PrismaClient
 
-if (process.env.NODE_ENV === 'production') {
+if (nodeEnv === 'production') {
   //In Production:
   prisma = new PrismaClient();
 } else {
@@ -18,3 +20,6 @@ if (process.env.NODE_ENV === 'production') {
 }
 
 export { prisma }
+
+// export all types
+export * from '@prisma/client';
