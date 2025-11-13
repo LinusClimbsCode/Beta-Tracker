@@ -5,14 +5,48 @@
   "description": "backend for the boulderingStrava App",
   "main": "dist/server.js",
   "type": "module",
+  "author": "Linus Mühlpointner - https://github.com/LinusClimbsCode",
+  "license": "ISC",
   "scripts": {
-    "dev": "nodemon --exec 'node --loader ts-node/esm' src/server.ts",
+    "dev": "node --watch --conditions development --env-file=.env --import tsx src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js"
   },
+  "imports": {
+    "#config": {
+      "development": "./src/config/index.ts",
+      "default": "./dist/config/index.js"
+    },
+    "#utils": {
+      "development": "./src/utils/index.ts",
+      "default": "./dist/utils/index.js"
+    },
+    "#routes": {
+      "development": "./src/routes/index.ts",
+      "default": "./dist/routes/index.js"
+    },
+    "#db": {
+      "development": "./src/db/index.ts",
+      "default": "./dist/db/index.js"
+    },
+    "#services": {
+      "development": "./src/services/index.ts",
+      "default": "./dist/services/index.js"
+    },
+    "#types": {
+      "development": "./src/types/index.ts",
+      "default": "./dist/types/index.js"
+    },
+    "#middleware": {
+      "development": "./src/middleware/index.ts",
+      "default": "./dist/middleware/index.js"
+    },
+    "#controllers": {
+      "development": "./src/controllers/index.ts",
+      "default": "./dist/controllers/index.js"
+    }
+  },
   "keywords": [],
-  "author": "Linus Mühlpointner - https://github.com/LinusClimbsCode",
-  "license": "ISC",
   "packageManager": "pnpm@10.13.1",
   "dependencies": {
     "@prisma/client": "^6.18.0",
@@ -20,7 +54,8 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
-    "multer": "^2.0.2"
+    "multer": "^2.0.2",
+    "zod": "^4.1.12"
   },
   "devDependencies": {
     "@types/bcryptjs": "^3.0.0",
@@ -31,6 +66,7 @@
     "nodemon": "^3.1.10",
     "prisma": "^6.18.0",
     "ts-node": "^10.9.2",
+    "tsx": "^4.20.6",
     "typescript": "^5.9.3"
   }
 }
