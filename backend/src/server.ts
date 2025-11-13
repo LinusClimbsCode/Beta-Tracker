@@ -1,7 +1,11 @@
 import express from 'express'
+import { config } from '#config'
 
 const app = express();
-const port = "127.0.0.1:3000";
+const PORT = config.server.port;
+const HOST = config.server.host;
 
 app.get('/', (_req, res) => res.send('hello world!'))
-app.listen(port, () => { console.log(`Server is running on ${port}`) })
+app.listen(PORT, HOST, () => {
+  console.log(`Server is running on ${HOST}:${PORT}`)
+})
