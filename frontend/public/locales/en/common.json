@@ -1,0 +1,17 @@
+{
+  "nav": {
+    "home": "Home",
+    "gyms": "Gyms",
+    "profile": "Profile"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "error": "Error"
+  },
+  "theme": {
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
+  }
+}
