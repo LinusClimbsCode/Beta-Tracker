@@ -1,22 +1,34 @@
-import { createUser, generateAccessToken, generateRefreshToken } from "#services";
+import { comparePassword, createUser, findUserByEmail, generateAccessToken, generateRefreshToken } from "#services";
 import { config } from "#config";
 import ms from "ms";
 
-export const registerController = async (req, res) => {
-  const { email, password, username, name, city } = req.body
+import type { Request, Response } from 'express'
+
+type TokenEssentials = {
+  refreshTokenExpiresAt: Date,
+  accessTokenExpiresAt: Date,
+  secureCookie: boolean
+}
+
+// helper function
+const getTokenExpiry = (): TokenEssentials => {
   const refreshTokenExpiresIn = ms(config.jwt.refreshExpiry)
   const refreshTokenExpiresAt = new Date(Date.now() + refreshTokenExpiresIn)
   const accessTokenExpiresIn = ms(config.jwt.accessExpiry)
   const accessTokenExpiresAt = new Date(Date.now() + accessTokenExpiresIn)
   const secureCookie = (config.server.nodeEnv === "development") ? false : true;
 
-  let user
-  let accessToken
-  let refreshToken
+  return { refreshTokenExpiresAt, accessTokenExpiresAt, secureCookie }
+}
 
-  user = await createUser(email, password, username, name, city)
-  accessToken = generateAccessToken(user.id, user.role, user.emailVerified)
-  refreshToken = await generateRefreshToken(user.id)
+// bussiness logic
+export const registerController = async (req: Request, res: Response) => {
+  const { email, password, username, name, city } = req.body
+  const { refreshTokenExpiresAt, accessTokenExpiresAt, secureCookie } = getTokenExpiry()
+
+  const user = await createUser(email, password, username, name, city)
+  const accessToken = generateAccessToken(user.id, user.role, user.emailVerified)
+  const refreshToken = await generateRefreshToken(user.id)
 
   res
     .status(201)
@@ -36,19 +48,51 @@ export const registerController = async (req, res) => {
     })
 }
 
-//   1. POST /register
-// 
-//   Input: req.body { email, password, username, name, city }Output: { success: true, userId }Cookies: accessToken,
-//   refreshToken (httpOnly)
-// 
-//   Stichworte:
-//   - createUser() aus user.service
-//   - generateAccessToken() aus auth.service
-//   - generateRefreshToken() aus auth.service
-//   - res.cookie() für beide Tokens
-//   - res.status(201).json()
-// 
-//   ---
+export const loginController = async (req: Request, res: Response) => {
+  const { email, password } = req.body
+  const { refreshTokenExpiresAt, accessTokenExpiresAt, secureCookie } = getTokenExpiry()
+
+  const user = await findUserByEmail(email)
+  if (!user) {
+    res
+      .status(401)
+      .json({
+        success: false,
+      })
+    return
+  }
+
+  const isMatch = await comparePassword(password, user.passwordHash)
+  if (!isMatch) {
+    res
+      .status(401)
+      .json({
+        success: false,
+      })
+    return
+  }
+
+  const accessToken = generateAccessToken(user.id, user.role, user.emailVerified)
+  const refreshToken = await generateRefreshToken(user.id)
+
+  res
+    .status(200)
+    .cookie('access_token', accessToken, {
+      expires: accessTokenExpiresAt,
+      secure: secureCookie,
+      httpOnly: true
+    })
+    .cookie('refresh_token', refreshToken, {
+      expires: refreshTokenExpiresAt,
+      secure: secureCookie,
+      httpOnly: true
+    })
+    .json({
+      success: true,
+      userId: user.id
+    })
+}
+
 //   2. POST /login
 // 
 //   Input: req.body { email, password }Output: { success: true, userId }Cookies: accessToken, refreshToken (httpOnly)
