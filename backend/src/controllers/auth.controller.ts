@@ -1,6 +1,7 @@
-import { comparePassword, createUser, findUserByEmail, generateAccessToken, generateRefreshToken } from "#services";
+import { comparePassword, createUser, deleteRefreshToken, findUserByEmail, generateAccessToken, generateRefreshToken } from "#services";
 import { config } from "#config";
 import ms from "ms";
+import { prisma } from "#db";
 
 import type { Request, Response } from 'express'
 
@@ -9,6 +10,10 @@ type TokenEssentials = {
   accessTokenExpiresAt: Date,
   secureCookie: boolean
 }
+
+// random variable names for cookies 
+const refreshCookie = 'ohe1inw2v'
+const accessCookie = '2wce98'
 
 // helper function
 const getTokenExpiry = (): TokenEssentials => {
@@ -32,12 +37,12 @@ export const registerController = async (req: Request, res: Response) => {
 
   res
     .status(201)
-    .cookie('access_token', accessToken, {
+    .cookie(accessCookie, accessToken, {
       expires: accessTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
     })
-    .cookie('refresh_token', refreshToken, {
+    .cookie(refreshCookie, refreshToken, {
       expires: refreshTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
@@ -77,12 +82,12 @@ export const loginController = async (req: Request, res: Response) => {
 
   res
     .status(200)
-    .cookie('access_token', accessToken, {
+    .cookie(accessCookie, accessToken, {
       expires: accessTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
     })
-    .cookie('refresh_token', refreshToken, {
+    .cookie(refreshCookie, refreshToken, {
       expires: refreshTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
@@ -93,37 +98,63 @@ export const loginController = async (req: Request, res: Response) => {
     })
 }
 
-//   2. POST /login
-// 
-//   Input: req.body { email, password }Output: { success: true, userId }Cookies: accessToken, refreshToken (httpOnly)
-// 
-//   Stichworte:
-//   - findUserByEmail() aus user.service
-//   - comparePassword() aus user.service
-//   - Check: User exists? Password correct?
-//   - generateAccessToken() und generateRefreshToken()
-//   - res.cookie() + res.json()
-// 
-//   ---
-//   3. POST /refresh
-// 
-//   Input: req.cookies.refreshTokenOutput: { success: true }Cookies: neuer accessToken (httpOnly)
-// 
-//   Stichworte:
-//   - Token aus Cookie holen
-//   - Refresh Token in DB finden (Prisma)
-//   - Token abgelaufen? Validieren
-//   - generateAccessToken() neu generieren
-//   - res.cookie() nur für accessToken
-// 
-//   ---
-//   4. POST /logout
-// 
-//   Input: req.cookies.refreshTokenOutput: { success: true }Cookies: beide löschen
-// 
-//   Stichworte:
-//   - deleteRefreshToken() aus auth.service
-//   - res.clearCookie() für beide Tokens
-//   - res.json()
-// 
-//   ---
+export const refreshAccessTokenController = async (req: Request, res: Response) => {
+  const { accessTokenExpiresAt, secureCookie } = getTokenExpiry()
+
+  const refreshToken = req.cookies[refreshCookie]
+  if (!refreshToken) {
+    res.status(401)
+      .json({
+        success: false
+      })
+    return
+  }
+
+  const isMatch = await prisma.refreshToken.findUnique({
+    where: {
+      token: refreshToken,
+      expiresAt: {
+        gt: new Date()
+      }
+    },
+    include: {
+      user: true
+    }
+  })
+  if (!isMatch) {
+    res.status(401)
+      .json({
+        success: false
+      })
+    return
+  }
+
+  const user = isMatch.user
+  const accessToken = generateAccessToken(user.id, user.role, user.emailVerified)
+
+  res
+    .status(200)
+    .cookie(accessCookie, accessToken, {
+      expires: accessTokenExpiresAt,
+      secure: secureCookie,
+      httpOnly: true
+    })
+    .json({
+      success: true,
+    })
+}
+
+export const logoutController = async (req: Request, res: Response) => {
+  const refreshToken = req.cookies[refreshCookie]
+
+  if (refreshToken) {
+    await deleteRefreshToken(refreshToken)
+  }
+
+  res.status(200)
+    .clearCookie(refreshCookie)
+    .clearCookie(accessCookie)
+    .json({
+      success: true,
+    })
+}
