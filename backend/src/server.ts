@@ -1,5 +1,6 @@
 import express from 'express'
 import { config } from '#config'
+import 'services'
 
 const app = express();
 const PORT = config.server.port;
