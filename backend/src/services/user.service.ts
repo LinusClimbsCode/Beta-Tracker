@@ -39,7 +39,7 @@ export const findUserById = async (id: string): Promise<User | null> => {
   return user
 }
 
-export const createUser = async (email: string, password: string, username: string, name: string, city: string): Promise<string> => {
+export const createUser = async (email: string, password: string, username: string, name: string, city: string): Promise<User> => {
   if (await findUserByEmail(email)) {
     throw new Error('user already exist!')
   }
@@ -54,5 +54,5 @@ export const createUser = async (email: string, password: string, username: stri
     }
   })
 
-  return user.id
+  return user
 }

@@ -7,7 +7,7 @@ const envSchema = z.object({
   JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
   JWT_REFRESH_SECRET: z.string().min(32),
   ACCESS_TOKEN_EXPIRY: z.string().default('30m'),
-  REFRESH_TOKEN_EXPIRY: z.string().transform(Number).pipe(z.number().int().positive()).default(30),
+  REFRESH_TOKEN_EXPIRY: z.string().default('30d'),
   // Crypto
   CRYPTO_HASH_ROUNDS: z.string().transform(Number).pipe(z.number().int().positive()).default(11),
 
@@ -38,7 +38,7 @@ type Config = {
     accessSecret: ParsedEnv['JWT_ACCESS_SECRET'],
     refreshSecret: ParsedEnv['JWT_REFRESH_SECRET'],
     accessExpiry: StringValue,
-    refreshExpiry: ParsedEnv['REFRESH_TOKEN_EXPIRY'],
+    refreshExpiry: StringValue,
   },
   crypto: {
     cryptoHashSalt: ParsedEnv['CRYPTO_HASH_ROUNDS'],
@@ -60,7 +60,7 @@ export const config: Config = {
     accessSecret: parsedEnv.data.JWT_ACCESS_SECRET,
     refreshSecret: parsedEnv.data.JWT_REFRESH_SECRET,
     accessExpiry: parsedEnv.data.ACCESS_TOKEN_EXPIRY as StringValue,
-    refreshExpiry: parsedEnv.data.REFRESH_TOKEN_EXPIRY,
+    refreshExpiry: parsedEnv.data.REFRESH_TOKEN_EXPIRY as StringValue,
   },
   crypto: {
     cryptoHashSalt: parsedEnv.data.CRYPTO_HASH_ROUNDS,

@@ -3,6 +3,7 @@ import crypto from 'node:crypto'
 import { config } from '#config'
 import { prisma } from '#db'
 import type { Role } from '#db'
+import ms from 'ms'
 
 type AccessTokenPayload = {
   userId: string
@@ -20,8 +21,8 @@ export const generateAccessToken = (userId: string, role: Role, verified: boolea
 }
 
 export const generateRefreshToken = async (userId: string) => {
-  const expiresIn = config.jwt.refreshExpiry
-  const expiresAt = new Date(Date.now() + (expiresIn * 86400000)) // 1day = 86400000ms
+  const expiresIn = ms(config.jwt.refreshExpiry)
+  const expiresAt = new Date(Date.now() + expiresIn)
   const token = crypto.randomBytes(32).toString('hex')
 
   await prisma.refreshToken.deleteMany({
