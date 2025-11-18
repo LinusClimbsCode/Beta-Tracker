@@ -1,1 +1,12 @@
 // Export all type definitions here
+export * from './common.types'
+export * from './user.types'
+export * from './gym.types'
+export * from './wall.types'
+export * from './boulder.types'
+export * from './color.types'
+export * from './grade.types'
+export * from './event.types'
+export * from './validation.types'
+export * from './userBoulder.types'
+export * from './rating.types'
