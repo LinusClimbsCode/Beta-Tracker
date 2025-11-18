@@ -1,7 +1,7 @@
 import express from 'express'
 import { config } from '#config'
 import 'services'
-import { authRouter, gymRouter, wallRouter, colorRouter, gradeRouter } from '#routes';
+import { authRouter, gymRouter, wallRouter, colorRouter, gradeRouter, eventRouter } from '#routes';
 import cookieParser from 'cookie-parser';
 import { requireAuth } from '#middleware/auth.middleware';
 import { errorHandler } from '#middleware/error.middleware';
@@ -23,6 +23,7 @@ app.use('/gym', gymRouter)
 app.use('/wall', wallRouter)
 app.use('/color', colorRouter)
 app.use('/grade', gradeRouter)
+app.use('/event', eventRouter)
 
 app.get('/protected', requireAuth, (req, res) => {
   res.json({ success: true, user: req.user })

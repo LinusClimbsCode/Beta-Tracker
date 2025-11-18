@@ -4,4 +4,5 @@ export * from './gym.service'
 export * from './wall.service'
 export * from './color.service'
 export * from './grade.service'
+export * from './event.service'
 
