@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from 'express'
-import { registerInputSchema, loginInputSchema } from '#schemas'
+import { createGymSchema, updateGymSchema } from '#schemas'
 
-export const validateRegister = (req: Request, res: Response, next: NextFunction) => {
-  const result = registerInputSchema.safeParse(req.body)
+export const validateCreateGym = (req: Request, res: Response, next: NextFunction) => {
+  const result = createGymSchema.safeParse(req.body)
 
   if (!result.success) {
     res.status(400).json({
@@ -15,8 +15,8 @@ export const validateRegister = (req: Request, res: Response, next: NextFunction
   next()
 }
 
-export const validateLogin = (req: Request, res: Response, next: NextFunction) => {
-  const result = loginInputSchema.safeParse(req.body)
+export const validateUpdateGym = (req: Request, res: Response, next: NextFunction) => {
+  const result = updateGymSchema.safeParse(req.body)
 
   if (!result.success) {
     res.status(400).json({

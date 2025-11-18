@@ -1,1 +1,7 @@
 export * from './auth.routes'
+export * from './gym.routes'
+export * from './wall.routes'
+export * from './color.routes'
+export * from './grade.routes'
+export * from './event.routes'
+export * from './boulder.routes'

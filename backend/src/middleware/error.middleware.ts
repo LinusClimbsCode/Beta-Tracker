@@ -3,7 +3,7 @@ import { ZodError } from 'zod'
 import { Prisma } from '@prisma/client'
 import { config } from '#config'
 
-export const errorHandler = (error: Error, req: Request, res: Response,) => {
+export const errorHandler = (error: Error, req: Request, res: Response, next: NextFunction) => {
   const isDev = config.server.nodeEnv === 'development'
 
   // Log in development

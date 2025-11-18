@@ -143,6 +143,8 @@ model ModeratorGym {
   gym         Gym      @relation(fields: [gymId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@unique([moderatorId, gymId])
 }
 
 // ========== LOCATION ==========
@@ -157,9 +159,9 @@ model Gym {
   openingHours     Json
   description      String
   priceInfo        Json
-  imageUrl         String?
+  imageUrl         String
   gradeSystemType  GradeSystemType
-  isActive         Boolean
+  isActive         Boolean         @default(true)
   walls            Wall[]
   events           Event[]
   favoritedByUsers User[]          @relation("favoriteByUsers")
@@ -167,6 +169,8 @@ model Gym {
   grades           Grade[]
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
+
+  @@unique([name, city, email])
 }
 
 model Wall {
@@ -324,7 +328,7 @@ model UserArchive {
 model RefreshToken {
   id        String   @id @default(cuid())
   token     String   @unique
-  userId    String
+  userId    String   @unique
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
