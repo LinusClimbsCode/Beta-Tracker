@@ -4,6 +4,7 @@ import 'services'
 import { authRouter } from '#routes';
 import cookieParser from 'cookie-parser';
 import { requireAuth } from '#middleware/auth.middleware';
+import { errorHandler } from '#middleware/error.middleware';
 
 const app = express();
 const PORT = config.server.port;
@@ -22,6 +23,8 @@ app.use('/auth', authRouter)
 app.get('/protected', requireAuth, (req, res) => {
   res.json({ success: true, user: req.user })
 })
+
+app.use(errorHandler)
 
 app.listen(PORT, HOST, () => {
   console.log(`Server is running on ${HOST}:${PORT}`)
