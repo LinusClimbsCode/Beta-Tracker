@@ -1,6 +1,7 @@
 import { Router } from "express";
-import { loginController, logoutController, refreshAccessTokenController, registerController } from '#controllers'
+import { loginController, logoutController, refreshAccessTokenController, registerController, getMeController } from '#controllers'
 import { validateLogin, validateRegister } from "#middleware/validate.auth";
+import { requireAuth } from "#middleware/auth.middleware";
 
 export const authRouter = Router()
 
@@ -11,3 +12,5 @@ authRouter.post('/register', validateRegister, registerController)
 authRouter.get('/logout', logoutController)
 
 authRouter.get('/refresh', refreshAccessTokenController)
+
+authRouter.get('/me', requireAuth, getMeController)
