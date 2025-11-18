@@ -143,6 +143,8 @@ model ModeratorGym {
   gym         Gym      @relation(fields: [gymId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+
+  @@unique([moderatorId, gymId])
 }
 
 // ========== LOCATION ==========
