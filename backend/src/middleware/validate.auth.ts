@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from 'express'
-import { registerInputSchema, loginInputSchema } from '#schemas/autch.schemas'
+import { registerInputSchema, loginInputSchema } from '#schemas'
 
 export const validateRegister = (req: Request, res: Response, next: NextFunction) => {
   const result = registerInputSchema.safeParse(req.body)
