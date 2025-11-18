@@ -1,4 +1,5 @@
 import express from 'express'
+import cors from 'cors'
 import { config } from '#config'
 import 'services'
 import { authRouter, gymRouter, wallRouter, colorRouter, gradeRouter, eventRouter, boulderRouter, boulderValidationRouter, userBoulderRouter, ratingRouter } from '#routes';
@@ -9,6 +10,12 @@ import { errorHandler } from '#middleware/error.middleware';
 const app = express();
 const PORT = config.server.port;
 const HOST = config.server.host;
+
+// CORS middleware - must be before other middleware
+app.use(cors({
+  origin: config.server.frontendUrl || 'http://localhost:5173',
+  credentials: true, // Allow cookies
+}))
 
 // middleware
 app.use(express.json())
