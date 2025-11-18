@@ -11,7 +11,7 @@ import { requireAuth, validateCreateWall, validateUpdateWall, validateWallQuery 
 export const wallRouter = Router()
 
 // Public
-wallRouter.get('/', validateWallQuery, getAllWallsController)
+wallRouter.get('/', getAllWallsController)
 wallRouter.get('/:id', getWallController)
 
 // Protected

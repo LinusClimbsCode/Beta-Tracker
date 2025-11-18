@@ -24,4 +24,4 @@ export const wallQuerySchema = z.object({
   gymId: z.string().cuid({ message: 'Invalid gym ID' }).optional(),
   city: z.string().min(2).optional(),
   setterId: z.string().cuid({ message: 'Invalid setter ID' }).optional()
-}).strict()
+})
