@@ -1,20 +1,7 @@
 import { prisma } from '#db'
-import type { GradeSystemType } from '#db'
+import type { Prisma } from '#db'
 
-export const createGym = async (data: {
-  name: string
-  address: object
-  city: string
-  website: string
-  phone: string
-  email: string
-  openingHours: object
-  description: string
-  priceInfo: object
-  imageUrl: string
-  gradeSystemType: GradeSystemType
-  isActive: boolean
-}) => {
+export const createGym = async (data: Prisma.GymCreateInput) => {
   return await prisma.gym.create({
     data
   })
