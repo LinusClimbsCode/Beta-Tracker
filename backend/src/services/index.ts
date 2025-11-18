@@ -6,4 +6,5 @@ export * from './color.service'
 export * from './grade.service'
 export * from './event.service'
 export * from './boulder.service'
+export * from './boulderValidation.service'
 
