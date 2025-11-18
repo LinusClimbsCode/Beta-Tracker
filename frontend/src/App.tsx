@@ -1,13 +1,34 @@
-import { ToggleThemeButton } from "./components"
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { AuthProvider } from '@/context'
+import { ProtectedRoute } from '@/components'
+import { Login, Register, Dashboard } from '@/pages'
+import { ROUTES } from '@/constants'
 
 function App() {
   return (
-    <div className="min-h-screen bg-blue-500 dark:bg-gray-900 flex items-center justify-center">
-      <h1 className="text-4xl font-bold text-gray-900 dark:text-white">
-        Tailwind funktioniert! 🎉
-      </h1>
-      <ToggleThemeButton />
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          {/* Public Routes */}
+          <Route path={ROUTES.LOGIN} element={<Login />} />
+          <Route path={ROUTES.REGISTER} element={<Register />} />
+
+          {/* Protected Routes */}
+          <Route
+            path={ROUTES.HOME}
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+
+          {/* Redirect to dashboard by default */}
+          <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
+
 export default App

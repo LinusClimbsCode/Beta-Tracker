@@ -20,6 +20,8 @@ export interface User {
 export interface RegisterRequest {
   email: string
   username: string
+  name: string
+  city: string
   password: string
 }
 
