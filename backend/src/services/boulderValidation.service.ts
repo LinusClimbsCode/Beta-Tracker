@@ -33,6 +33,80 @@ export const validateBoulder = async (
     throw new Error('You cannot validate your own boulder')
   }
 
+  // 3.1 Check if user is the verified setter - if so, auto-approve
+  if (boulder.verifiedSetterId === userId) {
+    // Setter confirming their own route - instant approval
+    const updatedBoulder = await prisma.boulder.update({
+      where: { id: data.boulderId },
+      data: {
+        status: 'approved',
+        currentValidationPoints: boulder.requiredValidationPoints
+      },
+      include: {
+        wall: {
+          include: {
+            gym: true
+          }
+        },
+        setGrade: true,
+        colors: true,
+        verifiedSetter: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        uploadedBy: {
+          select: {
+            id: true,
+            username: true
+          }
+        },
+        boulderValidations: {
+          include: {
+            user: {
+              select: {
+                id: true,
+                username: true
+              }
+            }
+          }
+        }
+      }
+    })
+
+    // Create validation record for tracking
+    const validation = await prisma.boulderValidation.create({
+      data: {
+        boulderId: data.boulderId,
+        userId,
+        validation: 'approve'
+      },
+      include: {
+        user: {
+          select: {
+            id: true,
+            username: true,
+            validationPower: true
+          }
+        }
+      }
+    })
+
+    return {
+      validation,
+      boulder: updatedBoulder,
+      statusMessage: 'Boulder approved by verified setter',
+      stats: {
+        approvalCount: 1,
+        rejectionCount: 0,
+        currentValidationPoints: boulder.requiredValidationPoints,
+        requiredValidationPoints: boulder.requiredValidationPoints,
+        needsModeratorReview: false
+      }
+    }
+  }
+
   // 4. Check if user already validated this boulder
   const existingValidation = await prisma.boulderValidation.findUnique({
     where: {
@@ -47,14 +121,18 @@ export const validateBoulder = async (
     throw new Error('You have already validated this boulder')
   }
 
-  // 5. Get user's validation power
+  // 5. Get user's validation power and check email verification
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { validationPower: true }
+    select: { validationPower: true, emailVerified: true }
   })
 
   if (!user) {
     throw new Error('User not found')
+  }
+
+  if (!user.emailVerified) {
+    throw new Error('Email must be verified to validate boulders')
   }
 
   // 6. Create validation record
@@ -80,15 +158,20 @@ export const validateBoulder = async (
     }
   })
 
-  // 7. Calculate approval/rejection counts
-  const approvalCount = boulder.boulderValidations.filter(v => v.validation === 'approve').length + (data.validation === 'approve' ? 1 : 0)
-  const rejectionCount = boulder.boulderValidations.filter(v => v.validation === 'reject').length + (data.validation === 'reject' ? 1 : 0)
+  // 7. Calculate approval/rejection counts (including the new validation we just created)
+  const allValidations = [...boulder.boulderValidations, validation]
+  const approvalCount = allValidations.filter(v => v.validation === 'approve').length
+  const rejectionCount = allValidations.filter(v => v.validation === 'reject').length
 
-  // 8. Calculate total validation points from approvals
-  let totalApprovalPoints = boulder.currentValidationPoints
+  // 8. Calculate total validation points from ALL approvals
+  let totalApprovalPoints = 0
 
-  if (data.validation === 'approve') {
-    totalApprovalPoints += user.validationPower
+  for (const v of allValidations) {
+    if (v.validation === 'approve') {
+      // Get the validation power of the user who approved (already included in the validation object)
+      const validatorPower = v.user?.validationPower || 0
+      totalApprovalPoints += validatorPower
+    }
   }
 
   // 9. Determine new status

@@ -14,11 +14,15 @@ export const createBoulder = async (
   // Get uploader to check if they're a setter
   const uploader = await prisma.user.findUnique({
     where: { id: uploadedById },
-    select: { setter: true, trustPoints: true }
+    select: { setter: true, trustPoints: true, emailVerified: true }
   })
 
   if (!uploader) {
     throw new Error('Uploader not found')
+  }
+
+  if (!uploader.emailVerified) {
+    throw new Error('Email must be verified to upload boulders')
   }
 
   // Calculate required validation points based on uploader's trust points
