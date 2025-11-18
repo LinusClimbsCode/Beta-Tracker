@@ -1,5 +1,5 @@
 import { comparePassword, createUser, deleteRefreshToken, findUserByEmail, generateAccessToken, generateRefreshToken } from "#services";
-import { config } from "#config";
+import { config, COOKIES } from "#config";
 import ms from "ms";
 import { prisma } from "#db";
 
@@ -11,9 +11,6 @@ type TokenEssentials = {
   secureCookie: boolean
 }
 
-// random variable names for cookies 
-const refreshCookie = 'ohe1inw2v'
-const accessCookie = '2wce98'
 
 // helper function
 const getTokenExpiry = (): TokenEssentials => {
@@ -37,12 +34,12 @@ export const registerController = async (req: Request, res: Response) => {
 
   res
     .status(201)
-    .cookie(accessCookie, accessToken, {
+    .cookie(COOKIES.ACCESS_TOKEN, accessToken, {
       expires: accessTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
     })
-    .cookie(refreshCookie, refreshToken, {
+    .cookie(COOKIES.REFRESH_TOKEN, refreshToken, {
       expires: refreshTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
@@ -82,12 +79,12 @@ export const loginController = async (req: Request, res: Response) => {
 
   res
     .status(200)
-    .cookie(accessCookie, accessToken, {
+    .cookie(COOKIES.ACCESS_TOKEN, accessToken, {
       expires: accessTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
     })
-    .cookie(refreshCookie, refreshToken, {
+    .cookie(COOKIES.REFRESH_TOKEN, refreshToken, {
       expires: refreshTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
@@ -101,7 +98,7 @@ export const loginController = async (req: Request, res: Response) => {
 export const refreshAccessTokenController = async (req: Request, res: Response) => {
   const { accessTokenExpiresAt, secureCookie } = getTokenExpiry()
 
-  const refreshToken = req.cookies[refreshCookie]
+  const refreshToken = req.cookies[COOKIES.REFRESH_TOKEN]
   if (!refreshToken) {
     res.status(401)
       .json({
@@ -134,7 +131,7 @@ export const refreshAccessTokenController = async (req: Request, res: Response) 
 
   res
     .status(200)
-    .cookie(accessCookie, accessToken, {
+    .cookie(COOKIES.ACCESS_TOKEN, accessToken, {
       expires: accessTokenExpiresAt,
       secure: secureCookie,
       httpOnly: true
@@ -145,15 +142,15 @@ export const refreshAccessTokenController = async (req: Request, res: Response) 
 }
 
 export const logoutController = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies[refreshCookie]
+  const refreshToken = req.cookies[COOKIES.REFRESH_TOKEN]
 
   if (refreshToken) {
     await deleteRefreshToken(refreshToken)
   }
 
   res.status(200)
-    .clearCookie(refreshCookie)
-    .clearCookie(accessCookie)
+    .clearCookie(COOKIES.REFRESH_TOKEN)
+    .clearCookie(COOKIES.ACCESS_TOKEN)
     .json({
       success: true,
     })
