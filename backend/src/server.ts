@@ -1,7 +1,7 @@
 import express from 'express'
 import { config } from '#config'
 import 'services'
-import { authRouter } from '#routes';
+import { authRouter, gymRouter } from '#routes';
 import cookieParser from 'cookie-parser';
 import { requireAuth } from '#middleware/auth.middleware';
 import { errorHandler } from '#middleware/error.middleware';
@@ -17,8 +17,9 @@ app.use(cookieParser())
 // home
 app.get('/', (_req, res) => res.send('hello world!'))
 
-// register
+// routes
 app.use('/auth', authRouter)
+app.use('/gym', gymRouter)
 
 app.get('/protected', requireAuth, (req, res) => {
   res.json({ success: true, user: req.user })
