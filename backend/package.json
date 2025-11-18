@@ -37,6 +37,10 @@
       "development": "./src/types/index.ts",
       "default": "./dist/types/index.js"
     },
+    "#schemas": {
+      "development": "./src/schemas/index.ts",
+      "default": "./dist/schemas/index.js"
+    },
     "#middleware": {
       "development": "./src/middleware/index.ts",
       "default": "./dist/middleware/index.js"
