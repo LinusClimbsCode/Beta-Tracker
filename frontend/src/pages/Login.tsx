@@ -1,10 +1,13 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/hooks/useAuth'
+import { Button, Input, FormError } from '@/components'
 import { ROUTES } from '@/constants'
 
 export function Login() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { login } = useAuth()
 
@@ -20,9 +23,9 @@ export function Login() {
 
     try {
       await login({ email, password })
-      navigate(ROUTES.HOME) // Redirect to dashboard after login
+      navigate(ROUTES.HOME)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Login failed')
+      setError(err instanceof Error ? err.message : t('auth.login.errorFailed'))
     } finally {
       setIsLoading(false)
     }
@@ -31,67 +34,49 @@ export function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900 px-4">
       <div className="max-w-md w-full space-y-8">
-        <div>
-          <h2 className="text-center text-3xl font-bold text-gray-900 dark:text-white">
-            Sign in to your account
-          </h2>
-        </div>
+        <h2 className="text-center text-3xl font-bold text-gray-900 dark:text-white">
+          {t('auth.login.title')}
+        </h2>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
+          {error && <FormError message={error} />}
 
           <div className="space-y-4">
-            <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Email
-              </label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                placeholder="you@example.com"
-              />
-            </div>
+            <Input
+              id="email"
+              name="email"
+              type="email"
+              label={t('auth.login.email')}
+              value={email}
+              onChange={setEmail}
+              placeholder={t('auth.login.emailPlaceholder')}
+              required
+            />
 
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Password
-              </label>
-              <input
-                id="password"
-                name="password"
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-800 dark:text-white"
-                placeholder="••••••••"
-              />
-            </div>
+            <Input
+              id="password"
+              name="password"
+              type="password"
+              label={t('auth.login.password')}
+              value={password}
+              onChange={setPassword}
+              placeholder={t('auth.login.passwordPlaceholder')}
+              required
+            />
           </div>
 
-          <div>
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? 'Signing in...' : 'Sign in'}
-            </button>
-          </div>
+          <Button
+            type="submit"
+            isLoading={isLoading}
+            className="w-full"
+          >
+            {isLoading ? t('auth.login.submittingButton') : t('auth.login.submitButton')}
+          </Button>
 
           <div className="text-center text-sm">
-            <span className="text-gray-600 dark:text-gray-400">Don't have an account? </span>
+            <span className="text-gray-600 dark:text-gray-400">{t('auth.login.noAccount')} </span>
             <Link to={ROUTES.REGISTER} className="font-medium text-blue-600 hover:text-blue-500 dark:text-blue-400">
-              Sign up
+              {t('auth.login.signUpLink')}
             </Link>
           </div>
         </form>

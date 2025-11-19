@@ -30,7 +30,7 @@ export interface ErrorResponse {
   }>
 }
 
-// Prisma Enums (matching backend exactly)
+// Prisma Enums
 // Using string literal union types for erasableSyntaxOnly compatibility
 export type UserRole = 'user' | 'moderator' | 'admin'
 

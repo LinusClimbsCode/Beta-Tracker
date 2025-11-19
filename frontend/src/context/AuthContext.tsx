@@ -13,7 +13,7 @@ interface AuthContextType {
   checkAuth: () => Promise<void>
 }
 
-// Create context with undefined default (will be provided by AuthProvider)
+// Create Auth context
 export const AuthContext = createContext<AuthContextType | undefined>(undefined)
 
 interface AuthProviderProps {

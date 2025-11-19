@@ -67,8 +67,6 @@ export const resetPassword = async (data: ResetPasswordRequest): Promise<{ succe
 
 /**
  * Get current authenticated user (check if still logged in)
- * Note: This endpoint doesn't exist in your backend yet, but is useful for checking auth status
- * You might want to add GET /auth/me to your backend
  */
 export const getCurrentUser = async (): Promise<User> => {
   const response = await api.get<{ success: boolean; user: User }>('/auth/me')

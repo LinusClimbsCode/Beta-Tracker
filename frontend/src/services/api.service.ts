@@ -35,9 +35,8 @@ api.interceptors.response.use(
       // Server responded with error status
       const errorMessage = error.response.data?.message || 'An error occurred'
 
-      // You can handle specific status codes here
       if (error.response.status === 401) {
-        // Unauthorized - could redirect to login
+        // Unauthorized - redirect to login
         console.error('Unauthorized - please login')
       }
 
