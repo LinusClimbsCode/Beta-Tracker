@@ -1,0 +1,50 @@
+{
+  "nav": {
+    "home": "Startseite",
+    "gyms": "Hallen",
+    "profile": "Profil"
+  },
+  "actions": {
+    "save": "Speichern",
+    "cancel": "Abbrechen",
+    "error": "Fehler"
+  },
+  "theme": {
+    "system": "System",
+    "light": "Hell",
+    "dark": "Dunkel"
+  },
+  "auth": {
+    "login": {
+      "title": "Melde dich an",
+      "email": "E-Mail",
+      "emailPlaceholder": "du@beispiel.de",
+      "password": "Passwort",
+      "passwordPlaceholder": "••••••••",
+      "submitButton": "Anmelden",
+      "submittingButton": "Melde an...",
+      "noAccount": "Noch kein Konto?",
+      "signUpLink": "Registrieren",
+      "errorFailed": "Anmeldung fehlgeschlagen"
+    },
+    "register": {
+      "title": "Erstelle dein Konto",
+      "email": "E-Mail",
+      "emailPlaceholder": "du@beispiel.de",
+      "username": "Benutzername",
+      "usernamePlaceholder": "maxmustermann",
+      "name": "Name",
+      "namePlaceholder": "Mustermann",
+      "city": "Stadt",
+      "cityPlaceholder": "Köln",
+      "password": "Passwort",
+      "passwordPlaceholder": "••••••••",
+      "passwordHint": "Min. 8 Zeichen, 1 Großbuchstabe, 1 Zahl, 1 Sonderzeichen (!@#$%^&*)",
+      "submitButton": "Registrieren",
+      "submittingButton": "Erstelle Konto...",
+      "haveAccount": "Hast du bereits ein Konto?",
+      "signInLink": "Anmelden",
+      "errorFailed": "Registrierung fehlgeschlagen"
+    }
+  }
+}

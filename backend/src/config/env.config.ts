@@ -18,6 +18,7 @@ const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'production']).default('development'),
   PORT: z.string().transform(Number).pipe(z.number().int().positive()).default(5432),
   HOST: z.string().default("127.0.0.1"),
+  FRONTEND_URL: z.string().url().optional(),
 });
 
 // Parse and validate
@@ -51,6 +52,7 @@ type Config = {
     nodeEnv: ParsedEnv['NODE_ENV'],
     port: ParsedEnv['PORT'],
     host: ParsedEnv['HOST'],
+    frontendUrl?: ParsedEnv['FRONTEND_URL'],
   },
 }
 
@@ -73,5 +75,6 @@ export const config: Config = {
     nodeEnv: parsedEnv.data.NODE_ENV,
     port: parsedEnv.data.PORT,
     host: parsedEnv.data.HOST,
+    frontendUrl: parsedEnv.data.FRONTEND_URL,
   },
 }

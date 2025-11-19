@@ -5,12 +5,12 @@ import { requireAuth } from "#middleware/auth.middleware";
 
 export const authRouter = Router()
 
-authRouter.get('/login', validateLogin, loginController)
+authRouter.post('/login', validateLogin, loginController)
 
 authRouter.post('/register', validateRegister, registerController)
 
-authRouter.get('/logout', logoutController)
+authRouter.post('/logout', logoutController)
 
-authRouter.get('/refresh', refreshAccessTokenController)
+authRouter.post('/refresh', refreshAccessTokenController)
 
 authRouter.get('/me', requireAuth, getMeController)

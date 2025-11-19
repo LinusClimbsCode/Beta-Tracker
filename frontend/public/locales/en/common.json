@@ -13,5 +13,38 @@
     "system": "System",
     "light": "Light",
     "dark": "Dark"
+  },
+  "auth": {
+    "login": {
+      "title": "Sign in to your account",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "submitButton": "Sign in",
+      "submittingButton": "Signing in...",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Sign up",
+      "errorFailed": "Login failed"
+    },
+    "register": {
+      "title": "Create your account",
+      "email": "Email",
+      "emailPlaceholder": "you@example.com",
+      "username": "Username",
+      "usernamePlaceholder": "johndoe",
+      "name": "Name",
+      "namePlaceholder": "Doe",
+      "city": "City",
+      "cityPlaceholder": "Cologne",
+      "password": "Password",
+      "passwordPlaceholder": "••••••••",
+      "passwordHint": "Min 8 chars, 1 uppercase, 1 number, 1 special char (!@#$%^&*)",
+      "submitButton": "Sign up",
+      "submittingButton": "Creating account...",
+      "haveAccount": "Already have an account?",
+      "signInLink": "Sign in",
+      "errorFailed": "Registration failed"
+    }
   }
 }

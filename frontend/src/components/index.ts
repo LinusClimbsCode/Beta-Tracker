@@ -1,1 +1,8 @@
 export { ToggleThemeButton } from './ToggleThemeButton'
+export { LoadingSpinner } from './LoadingSpinner'
+export { ProtectedRoute } from './ProtectedRoute'
+export { Button } from './Button'
+export { Navbar } from './Navbar'
+export { StatCard } from './StatCard'
+export { Input } from './Input'
+export { FormError } from './FormError'
