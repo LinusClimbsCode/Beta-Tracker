@@ -1,4 +1,4 @@
-import { ReactNode } from 'react'
+import type { ReactNode } from 'react'
 
 type StatCardColor = 'blue' | 'green' | 'purple' | 'yellow' | 'red' | 'indigo' | 'orange'
 

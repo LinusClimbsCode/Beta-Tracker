@@ -1,4 +1,4 @@
-import { GradeRating, QualityRating } from './common.types'
+import type { GradeRating, QualityRating } from './common.types'
 
 // Rating type (as returned by API)
 export interface Rating {

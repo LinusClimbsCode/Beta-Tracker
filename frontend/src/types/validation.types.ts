@@ -1,4 +1,4 @@
-import { ValidationVote } from './common.types'
+import type { ValidationVote } from './common.types'
 
 // BoulderValidation type (as returned by API)
 export interface BoulderValidation {

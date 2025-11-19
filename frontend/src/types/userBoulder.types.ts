@@ -1,4 +1,4 @@
-import { UserBoulderStatus } from './common.types'
+import type { UserBoulderStatus } from './common.types'
 
 // UserBoulder type (as returned by API)
 export interface UserBoulder {

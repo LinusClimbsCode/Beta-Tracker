@@ -31,52 +31,19 @@ export interface ErrorResponse {
 }
 
 // Prisma Enums (matching backend exactly)
-export enum UserRole {
-  user = 'user',
-  moderator = 'moderator',
-  admin = 'admin'
-}
+// Using string literal union types for erasableSyntaxOnly compatibility
+export type UserRole = 'user' | 'moderator' | 'admin'
 
-export enum UserLevel {
-  Newbie = 'Newbie',
-  Regular = 'Regular',
-  HallenOG = 'HallenOG'
-}
+export type UserLevel = 'Newbie' | 'Regular' | 'HallenOG'
 
-export enum BoulderStatus {
-  pending = 'pending',
-  approved = 'approved',
-  rejected = 'rejected',
-  flagged = 'flagged'
-}
+export type BoulderStatus = 'pending' | 'approved' | 'rejected' | 'flagged'
 
-export enum WallType {
-  overhang = 'overhang',
-  slab = 'slab',
-  vertical = 'vertical',
-  roof = 'roof'
-}
+export type WallType = 'overhang' | 'slab' | 'vertical' | 'roof'
 
-export enum UserBoulderStatus {
-  project = 'project',
-  flash = 'flash',
-  top = 'top'
-}
+export type UserBoulderStatus = 'project' | 'flash' | 'top'
 
-export enum GradeRating {
-  easy = 'easy',
-  appropriate = 'appropriate',
-  hard = 'hard'
-}
+export type GradeRating = 'easy' | 'appropriate' | 'hard'
 
-export enum QualityRating {
-  liked = 'liked',
-  neutral = 'neutral',
-  disliked = 'disliked'
-}
+export type QualityRating = 'liked' | 'neutral' | 'disliked'
 
-export enum ValidationVote {
-  approve = 'approve',
-  reject = 'reject',
-  flag = 'flag'
-}
+export type ValidationVote = 'approve' | 'reject' | 'flag'

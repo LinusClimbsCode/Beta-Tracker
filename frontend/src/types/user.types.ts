@@ -1,4 +1,4 @@
-import { UserRole, UserLevel } from './common.types'
+import type { UserRole, UserLevel } from './common.types'
 
 // User type (as returned by API - no password!)
 export interface User {

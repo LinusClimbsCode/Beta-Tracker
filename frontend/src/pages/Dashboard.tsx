@@ -26,7 +26,7 @@ export function Dashboard() {
         </div>
 
         {user?.setter && (
-          <div className="mt-4 p-4 bg-gradient-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg">
+          <div className="mt-4 p-4 bg-linear-to-r from-orange-50 to-red-50 dark:from-orange-900/20 dark:to-red-900/20 rounded-lg">
             <p className="text-lg font-semibold text-gray-900 dark:text-white">
               🏆 Community Setter Badge
             </p>

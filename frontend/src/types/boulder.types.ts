@@ -1,4 +1,4 @@
-import { BoulderStatus, GradeRating, QualityRating } from './common.types'
+import type { BoulderStatus, GradeRating, QualityRating } from './common.types'
 import type { Color } from './color.types'
 import type { Grade } from './grade.types'
 

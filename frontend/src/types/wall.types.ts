@@ -1,4 +1,4 @@
-import { WallType } from './common.types'
+import type { WallType } from './common.types'
 
 // Wall type (as returned by API)
 export interface Wall {
