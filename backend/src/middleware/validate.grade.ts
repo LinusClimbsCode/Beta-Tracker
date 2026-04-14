@@ -6,16 +6,17 @@ export const validateCreateGrade = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = createGradeSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = createGradeSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      errors: result.error.issues,
     });
+    return;
   }
+
+  next();
 };
 
 export const validateUpdateGrade = (
@@ -23,15 +24,15 @@ export const validateUpdateGrade = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = updateGradeSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = updateGradeSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      errors: result.error.issues,
     });
+    return;
   }
+
+  next();
 };
-// TODO errorhandliingf

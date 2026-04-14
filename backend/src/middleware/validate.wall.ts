@@ -6,16 +6,19 @@ export const validateCreateWall = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = createWallSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = createWallSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      message: "Invalid wall data",
+      errors: result.error.issues,
     });
+    return;
   }
+
+  req.body = result.data;
+  next();
 };
 
 export const validateUpdateWall = (
@@ -23,16 +26,19 @@ export const validateUpdateWall = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = updateWallSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = updateWallSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      message: "Invalid wall update data",
+      errors: result.error.issues,
     });
+    return;
   }
+
+  req.body = result.data;
+  next();
 };
 
 export const validateWallQuery = (
@@ -40,15 +46,17 @@ export const validateWallQuery = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.query = wallQuerySchema.parse(req.query);
-    next();
-  } catch (error: any) {
+  const result = wallQuerySchema.safeParse(req.query);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Invalid query parameters",
-      errors: error.errors,
+      message: "Invalid wall data",
+      errors: result.error.issues,
     });
+    return;
   }
+
+  req.body = result.data;
+  next();
 };
-// TODO errorhandliingf

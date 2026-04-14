@@ -6,15 +6,17 @@ export const validateBoulderValidation = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = createBoulderValidationSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = createBoulderValidationSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      message: "Invalid boulder validation data",
+      errors: result.error.issues,
     });
+    return;
   }
+
+  req.body = result.data;
+  next();
 };
-// TODO errorhandliingf

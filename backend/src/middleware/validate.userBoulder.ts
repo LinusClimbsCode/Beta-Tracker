@@ -6,16 +6,16 @@ export const validateCreateUserBoulder = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = createUserBoulderSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = createUserBoulderSchema.safeParse(req.body);
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      errors: result.error.issues,
     });
+    return;
   }
+
+  next();
 };
 
 export const validateUpdateUserBoulder = (
@@ -23,15 +23,13 @@ export const validateUpdateUserBoulder = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = updateUserBoulderSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = updateUserBoulderSchema.safeParse(req.body);
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      errors: result.error.issues,
     });
+    return;
   }
+  next();
 };
-// TODO errorhandliingf

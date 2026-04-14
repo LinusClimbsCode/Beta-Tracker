@@ -12,7 +12,7 @@ export const validateCreateRating = (
     res.status(400).json({
       success: false,
       message: "Invalid rating data",
-      errors: result.error.errors,
+      errors: result.error.issues,
     });
     return;
   }
@@ -32,7 +32,7 @@ export const validateUpdateRating = (
     res.status(400).json({
       success: false,
       message: "Invalid rating update data",
-      errors: result.error.errors,
+      errors: result.error.issues,
     });
     return;
   }
@@ -40,4 +40,3 @@ export const validateUpdateRating = (
   req.body = result.data;
   next();
 };
-// TODO errorhandliingf

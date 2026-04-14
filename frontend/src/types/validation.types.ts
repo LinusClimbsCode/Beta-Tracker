@@ -37,4 +37,3 @@ export interface ValidationStats {
   totalPoints: number
   requiredPoints: number
 }
-// TODO errorhandling safeParse

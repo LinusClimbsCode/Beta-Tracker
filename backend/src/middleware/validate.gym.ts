@@ -36,4 +36,3 @@ export const validateUpdateGym = (
 
   next();
 };
-// TODO errorhandling safeParse

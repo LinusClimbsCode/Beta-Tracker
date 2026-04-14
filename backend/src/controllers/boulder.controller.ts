@@ -16,20 +16,13 @@ export const createBoulderController = async (req: Request, res: Response) => {
     return;
   }
 
-  try {
-    const boulder = await createBoulder(req.body, req.user.id);
-    // TODO error handling any nonono
-    res.status(201).json({
-      success: true,
-      boulder,
-    });
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
-    });
-  }
+  const boulder = await createBoulder(req.body, req.user.id);
+  res.status(201).json({
+    success: true,
+    boulder,
+  });
 };
+
 // TODO BUG if(!id) will never happen
 export const getBoulderController = async (req: Request, res: Response) => {
   const { id } = req.params;
@@ -92,17 +85,10 @@ export const updateBoulderController = async (req: Request, res: Response) => {
     return;
   }
 
-  try {
     const boulder = await updateBoulder(id, data);
-
     res.json({
       success: true,
       boulder,
-    });
-  } catch (error: any) {
-    res.status(400).json({
-      success: false,
-      message: error.message,
     });
   }
 };

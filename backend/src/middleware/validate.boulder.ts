@@ -6,16 +6,18 @@ export const validateCreateBoulder = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = createBoulderSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = createBoulderSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      message: "Invalid boulder data",
+      errors: result.error.issues,
     });
+    return;
   }
+
+  next();
 };
 
 export const validateUpdateBoulder = (
@@ -23,15 +25,16 @@ export const validateUpdateBoulder = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = updateBoulderSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = updateBoulderSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      message: "Invalid boulder data",
+      errors: result.error.issues,
     });
+    return;
   }
+
+  next();
 };
-// TODO errorhandliingf

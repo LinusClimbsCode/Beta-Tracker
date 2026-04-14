@@ -6,16 +6,17 @@ export const validateCreateColor = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = createColorSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = createColorSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      errors: result.error.issues,
     });
+    return;
   }
+
+  next();
 };
 
 export const validateUpdateColor = (
@@ -23,16 +24,15 @@ export const validateUpdateColor = (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    req.body = updateColorSchema.parse(req.body);
-    next();
-  } catch (error: any) {
+  const result = updateColorSchema.safeParse(req.body);
+
+  if (!result.success) {
     res.status(400).json({
       success: false,
-      message: "Validation failed",
-      errors: error.errors,
+      errors: result.error.issues,
     });
+    return;
   }
-};
 
-// TODO errorhandliingf
+  next();
+};
