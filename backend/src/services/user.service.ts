@@ -56,3 +56,5 @@ export const createUser = async (email: string, password: string, username: stri
 
   return user
 }
+
+# TODO updateUser, getUserStatus, findUserByUsername

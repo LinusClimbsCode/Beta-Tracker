@@ -1,26 +1,26 @@
-import { prisma } from '#db'
-import type { Status } from '#db'
+import { prisma } from "#db";
+import type { Status } from "#db";
 
 export const createUserBoulder = async (
   data: {
-    boulderId: string
-    status: Status
-    attempts: number
+    boulderId: string;
+    status: Status;
+    attempts: number;
   },
-  userId: string
+  userId: string,
 ) => {
   // Check if user has verified email
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { emailVerified: true }
-  })
+    select: { emailVerified: true },
+  });
 
   if (!user) {
-    throw new Error('User not found')
+    throw new Error("User not found");
   }
 
   if (!user.emailVerified) {
-    throw new Error('Email must be verified to log boulder attempts')
+    throw new Error("Email must be verified to log boulder attempts");
   }
 
   // Check if user already has a record for this boulder
@@ -28,26 +28,28 @@ export const createUserBoulder = async (
     where: {
       boulderId_userId: {
         boulderId: data.boulderId,
-        userId
-      }
-    }
-  })
+        userId,
+      },
+    },
+  });
 
   if (existing) {
-    throw new Error('You have already logged an attempt for this boulder. Use update instead.')
+    throw new Error(
+      "You have already logged an attempt for this boulder. Use update instead.",
+    );
   }
 
   // Check if boulder exists
   const boulder = await prisma.boulder.findUnique({
-    where: { id: data.boulderId }
-  })
+    where: { id: data.boulderId },
+  });
 
   if (!boulder) {
-    throw new Error('Boulder not found')
+    throw new Error("Boulder not found");
   }
 
   // Create the record
-  const now = new Date()
+  const now = new Date();
 
   return await prisma.userBoulder.create({
     data: {
@@ -56,8 +58,8 @@ export const createUserBoulder = async (
       status: data.status,
       attempts: data.attempts,
       firstAttemptAt: now,
-      completedAt: now, // Set to now initially, will update if status changes to flash/top later
-      xpAwarded: 0 // Will be calculated in Phase 3
+      completedAt: now, // Set to now initially, will update if status changes to flash/top later (in schema datetime)
+      xpAwarded: 0, // Will be calculated in Phase 3
     },
     include: {
       boulder: {
@@ -67,18 +69,18 @@ export const createUserBoulder = async (
               name: true,
               gym: {
                 select: {
-                  name: true
-                }
-              }
-            }
+                  name: true,
+                },
+              },
+            },
           },
           setGrade: true,
-          colors: true
-        }
-      }
-    }
-  })
-}
+          colors: true,
+        },
+      },
+    },
+  });
+};
 
 export const getUserBoulderById = async (id: string) => {
   return await prisma.userBoulder.findUnique({
@@ -91,37 +93,40 @@ export const getUserBoulderById = async (id: string) => {
               name: true,
               gym: {
                 select: {
-                  name: true
-                }
-              }
-            }
+                  name: true,
+                },
+              },
+            },
           },
           setGrade: true,
-          colors: true
-        }
+          colors: true,
+        },
       },
       user: {
         select: {
           id: true,
-          username: true
-        }
-      }
-    }
-  })
-}
+          username: true,
+        },
+      },
+    },
+  });
+};
 
-export const getUserBoulders = async (userId: string, filters?: {
-  status?: Status
-  boulderId?: string
-}) => {
-  const where: any = { userId }
+export const getUserBoulders = async (
+  userId: string,
+  filters?: {
+    status?: Status;
+    boulderId?: string;
+  },
+) => {
+  const where: any = { userId };
 
   if (filters?.status) {
-    where.status = filters.status
+    where.status = filters.status;
   }
 
   if (filters?.boulderId) {
-    where.boulderId = filters.boulderId
+    where.boulderId = filters.boulderId;
   }
 
   return await prisma.userBoulder.findMany({
@@ -134,55 +139,55 @@ export const getUserBoulders = async (userId: string, filters?: {
               name: true,
               gym: {
                 select: {
-                  name: true
-                }
-              }
-            }
+                  name: true,
+                },
+              },
+            },
           },
           setGrade: true,
-          colors: true
-        }
-      }
+          colors: true,
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
-    }
-  })
-}
+      createdAt: "desc",
+    },
+  });
+};
 
 export const updateUserBoulder = async (
   id: string,
   data: {
-    status?: Status
-    attempts?: number
+    status?: Status;
+    attempts?: number;
   },
-  userId: string
+  userId: string,
 ) => {
   // Check if record exists and belongs to user
   const existing = await prisma.userBoulder.findUnique({
-    where: { id }
-  })
+    where: { id },
+  });
 
   if (!existing) {
-    throw new Error('UserBoulder record not found')
+    throw new Error("UserBoulder record not found");
   }
 
   if (existing.userId !== userId) {
-    throw new Error('You can only update your own boulder attempts')
+    throw new Error("You can only update your own boulder attempts");
   }
 
-  const updateData: any = {}
+  const updateData: any = {};
 
   if (data.status) {
-    updateData.status = data.status
+    updateData.status = data.status;
     // Update completedAt if status changed to flash or top
-    if (data.status === 'flash' || data.status === 'top') {
-      updateData.completedAt = new Date()
+    if (data.status === "flash" || data.status === "top") {
+      updateData.completedAt = new Date();
     }
   }
 
   if (data.attempts !== undefined) {
-    updateData.attempts = data.attempts
+    updateData.attempts = data.attempts;
   }
 
   return await prisma.userBoulder.update({
@@ -196,34 +201,34 @@ export const updateUserBoulder = async (
               name: true,
               gym: {
                 select: {
-                  name: true
-                }
-              }
-            }
+                  name: true,
+                },
+              },
+            },
           },
           setGrade: true,
-          colors: true
-        }
-      }
-    }
-  })
-}
+          colors: true,
+        },
+      },
+    },
+  });
+};
 
 export const deleteUserBoulder = async (id: string, userId: string) => {
   // Check if record exists and belongs to user
   const existing = await prisma.userBoulder.findUnique({
-    where: { id }
-  })
+    where: { id },
+  });
 
   if (!existing) {
-    throw new Error('UserBoulder record not found')
+    throw new Error("UserBoulder record not found");
   }
 
   if (existing.userId !== userId) {
-    throw new Error('You can only delete your own boulder attempts')
+    throw new Error("You can only delete your own boulder attempts");
   }
 
   return await prisma.userBoulder.delete({
-    where: { id }
-  })
-}
+    where: { id },
+  });
+};

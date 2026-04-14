@@ -1,5 +1,16 @@
 {
-	"devDependencies": {
-		"tsx": "^4.20.6"
-	}
+  "name": "boulder-strava",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Community-driven boulder climbing app",
+  "author": "Linus Mühlpointner - https://github.com/LinusClimbsCode",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "pnpm --parallel -r dev",
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck"
+  },
+  "packageManager": "pnpm@10.13.1"
 }

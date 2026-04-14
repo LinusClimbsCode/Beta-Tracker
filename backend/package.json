@@ -10,7 +10,8 @@
   "scripts": {
     "dev": "node --watch --conditions development --env-file=.env --import tsx src/server.ts",
     "build": "tsc",
-    "start": "node dist/server.js"
+    "start": "node dist/server.js",
+    "typecheck": "tsc --noEmit"
   },
   "imports": {
     "#config": {
@@ -64,8 +65,8 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@types/bcryptjs": "^3.0.0",
     "@types/cookie-parser": "^1.4.10",
+    "@types/cors": "^2.8.17",
     "@types/express": "^5.0.5",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/ms": "^2.1.0",

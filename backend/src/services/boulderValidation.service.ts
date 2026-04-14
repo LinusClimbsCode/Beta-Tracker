@@ -1,12 +1,12 @@
-import { prisma } from '#db'
-import type { Validation } from '#db'
+import { prisma } from "#db";
+import type { Validation } from "#db";
 
 export const validateBoulder = async (
   data: {
-    boulderId: string
-    validation: Validation
+    boulderId: string;
+    validation: Validation;
   },
-  userId: string
+  userId: string,
 ) => {
   // 1. Get boulder with current validations
   const boulder = await prisma.boulder.findUnique({
@@ -14,23 +14,23 @@ export const validateBoulder = async (
     include: {
       boulderValidations: true,
       uploadedBy: {
-        select: { id: true }
-      }
-    }
-  })
+        select: { id: true },
+      },
+    },
+  });
 
   if (!boulder) {
-    throw new Error('Boulder not found')
+    throw new Error("Boulder not found");
   }
 
   // 2. Check if boulder is pending (can't validate approved/rejected boulders)
-  if (boulder.status !== 'pending') {
-    throw new Error(`Cannot validate boulder with status: ${boulder.status}`)
+  if (boulder.status !== "pending") {
+    throw new Error(`Cannot validate boulder with status: ${boulder.status}`);
   }
 
   // 3. Check if user is trying to validate their own upload
   if (boulder.uploadedBy.id === userId) {
-    throw new Error('You cannot validate your own boulder')
+    throw new Error("You cannot validate your own boulder");
   }
 
   // 3.1 Check if user is the verified setter - if so, auto-approve
@@ -39,72 +39,72 @@ export const validateBoulder = async (
     const updatedBoulder = await prisma.boulder.update({
       where: { id: data.boulderId },
       data: {
-        status: 'approved',
-        currentValidationPoints: boulder.requiredValidationPoints
+        status: "approved",
+        currentValidationPoints: boulder.requiredValidationPoints,
       },
       include: {
         wall: {
           include: {
-            gym: true
-          }
+            gym: true,
+          },
         },
         setGrade: true,
         colors: true,
         verifiedSetter: {
           select: {
             id: true,
-            username: true
-          }
+            username: true,
+          },
         },
         uploadedBy: {
           select: {
             id: true,
-            username: true
-          }
+            username: true,
+          },
         },
         boulderValidations: {
           include: {
             user: {
               select: {
                 id: true,
-                username: true
-              }
-            }
-          }
-        }
-      }
-    })
+                username: true,
+              },
+            },
+          },
+        },
+      },
+    });
 
     // Create validation record for tracking
     const validation = await prisma.boulderValidation.create({
       data: {
         boulderId: data.boulderId,
         userId,
-        validation: 'approve'
+        validation: "approve",
       },
       include: {
         user: {
           select: {
             id: true,
             username: true,
-            validationPower: true
-          }
-        }
-      }
-    })
+            validationPower: true,
+          },
+        },
+      },
+    });
 
     return {
       validation,
       boulder: updatedBoulder,
-      statusMessage: 'Boulder approved by verified setter',
+      statusMessage: "Boulder approved by verified setter",
       stats: {
         approvalCount: 1,
         rejectionCount: 0,
         currentValidationPoints: boulder.requiredValidationPoints,
         requiredValidationPoints: boulder.requiredValidationPoints,
-        needsModeratorReview: false
-      }
-    }
+        needsModeratorReview: false,
+      },
+    };
   }
 
   // 4. Check if user already validated this boulder
@@ -112,27 +112,27 @@ export const validateBoulder = async (
     where: {
       boulderId_userId: {
         boulderId: data.boulderId,
-        userId
-      }
-    }
-  })
+        userId,
+      },
+    },
+  });
 
   if (existingValidation) {
-    throw new Error('You have already validated this boulder')
+    throw new Error("You have already validated this boulder");
   }
 
   // 5. Get user's validation power and check email verification
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { validationPower: true, emailVerified: true }
-  })
+    select: { validationPower: true, emailVerified: true },
+  });
 
   if (!user) {
-    throw new Error('User not found')
+    throw new Error("User not found");
   }
 
   if (!user.emailVerified) {
-    throw new Error('Email must be verified to validate boulders')
+    throw new Error("Email must be verified to validate boulders");
   }
 
   // 6. Create validation record
@@ -140,57 +140,62 @@ export const validateBoulder = async (
     data: {
       boulderId: data.boulderId,
       userId,
-      validation: data.validation
+      validation: data.validation,
     },
     include: {
       user: {
         select: {
           id: true,
           username: true,
-          validationPower: true
-        }
+          validationPower: true,
+        },
       },
       boulder: {
         include: {
-          boulderValidations: true
-        }
-      }
-    }
-  })
+          boulderValidations: true,
+        },
+      },
+    },
+  });
 
   // 7. Calculate approval/rejection counts (including the new validation we just created)
-  const allValidations = [...boulder.boulderValidations, validation]
-  const approvalCount = allValidations.filter(v => v.validation === 'approve').length
-  const rejectionCount = allValidations.filter(v => v.validation === 'reject').length
+  const allValidations = [...boulder.boulderValidations, validation];
+  const approvalCount = allValidations.filter(
+    (v) => v.validation === "approve",
+  ).length;
+  const rejectionCount = allValidations.filter(
+    (v) => v.validation === "reject",
+  ).length;
 
   // 8. Calculate total validation points from ALL approvals
-  let totalApprovalPoints = 0
+  let totalApprovalPoints = 0;
 
   for (const v of allValidations) {
-    if (v.validation === 'approve') {
+    if (v.validation === "approve") {
       // Get the validation power of the user who approved (already included in the validation object)
-      const validatorPower = v.user?.validationPower || 0
-      totalApprovalPoints += validatorPower
+      // TODO BUG boulderValidation v.user always undefined check
+      const validatorPower = v.user?.validationPower || 0;
+      totalApprovalPoints += validatorPower;
     }
   }
 
   // 9. Determine new status
-  let newStatus = boulder.status
-  let statusMessage = ''
+  let newStatus = boulder.status;
+  let statusMessage = "";
 
-  if (data.validation === 'approve') {
+  if (data.validation === "approve") {
     // Check if enough approval points reached
     if (totalApprovalPoints >= boulder.requiredValidationPoints) {
-      newStatus = 'approved'
-      statusMessage = 'Boulder has been approved!'
+      newStatus = "approved";
+      statusMessage = "Boulder has been approved!";
     }
-  } else if (data.validation === 'reject') {
+  } else if (data.validation === "reject") {
     // Check rejection thresholds
     if (rejectionCount >= 5) {
-      newStatus = 'rejected'
-      statusMessage = 'Boulder has been automatically rejected (5 rejections)'
+      newStatus = "rejected";
+      statusMessage = "Boulder has been automatically rejected (5 rejections)";
     } else if (rejectionCount >= 3) {
-      statusMessage = 'Boulder flagged for moderator review (3 rejections)'
+      statusMessage = "Boulder flagged for moderator review (3 rejections)";
       // TODO: Notify moderator (implement notification system later)
     }
   }
@@ -200,40 +205,40 @@ export const validateBoulder = async (
     where: { id: data.boulderId },
     data: {
       currentValidationPoints: totalApprovalPoints,
-      status: newStatus
+      status: newStatus,
     },
     include: {
       wall: {
         include: {
-          gym: true
-        }
+          gym: true,
+        },
       },
       setGrade: true,
       colors: true,
       verifiedSetter: {
         select: {
           id: true,
-          username: true
-        }
+          username: true,
+        },
       },
       uploadedBy: {
         select: {
           id: true,
-          username: true
-        }
+          username: true,
+        },
       },
       boulderValidations: {
         include: {
           user: {
             select: {
               id: true,
-              username: true
-            }
-          }
-        }
-      }
-    }
-  })
+              username: true,
+            },
+          },
+        },
+      },
+    },
+  });
 
   return {
     validation,
@@ -244,10 +249,10 @@ export const validateBoulder = async (
       rejectionCount,
       currentValidationPoints: totalApprovalPoints,
       requiredValidationPoints: boulder.requiredValidationPoints,
-      needsModeratorReview: rejectionCount >= 3 && rejectionCount < 5
-    }
-  }
-}
+      needsModeratorReview: rejectionCount >= 3 && rejectionCount < 5,
+    },
+  };
+};
 
 export const getBoulderValidations = async (boulderId: string) => {
   return await prisma.boulderValidation.findMany({
@@ -257,15 +262,15 @@ export const getBoulderValidations = async (boulderId: string) => {
         select: {
           id: true,
           username: true,
-          validationPower: true
-        }
-      }
+          validationPower: true,
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
-    }
-  })
-}
+      createdAt: "desc",
+    },
+  });
+};
 
 export const getUserValidations = async (userId: string) => {
   return await prisma.boulderValidation.findMany({
@@ -281,16 +286,16 @@ export const getUserValidations = async (userId: string) => {
               name: true,
               gym: {
                 select: {
-                  name: true
-                }
-              }
-            }
-          }
-        }
-      }
+                  name: true,
+                },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
-    }
-  })
-}
+      createdAt: "desc",
+    },
+  });
+};

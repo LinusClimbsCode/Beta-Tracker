@@ -1,42 +1,43 @@
-import { prisma } from '#db'
+import { prisma } from "#db";
 
 export const createBoulder = async (
   data: {
-    wallId: string
-    name?: string
-    setGradeId: string
-    verifiedSetterId?: string
-    unverifiedSetterName?: string
-    colorIds: string[]
+    wallId: string;
+    name?: string;
+    setGradeId: string;
+    verifiedSetterId?: string;
+    unverifiedSetterName?: string;
+    colorIds: string[];
   },
-  uploadedById: string
+  uploadedById: string,
 ) => {
   // Get uploader to check if they're a setter
   const uploader = await prisma.user.findUnique({
     where: { id: uploadedById },
-    select: { setter: true, trustPoints: true, emailVerified: true }
-  })
+    select: { setter: true, trustPoints: true, emailVerified: true },
+  });
 
   if (!uploader) {
-    throw new Error('Uploader not found')
+    throw new Error("Uploader not found");
   }
 
   if (!uploader.emailVerified) {
-    throw new Error('Email must be verified to upload boulders')
+    throw new Error("Email must be verified to upload boulders");
   }
 
   // Calculate required validation points based on uploader's trust points
-  // You mentioned in docs: 1-3 validations based on TrustPoints
-  let requiredValidationPoints = 3 // Default: need 3 validations
+  let requiredValidationPoints = 3; // Default: need 3 validations
   if (uploader.trustPoints >= 100) {
-    requiredValidationPoints = 1
+    requiredValidationPoints = 1;
   } else if (uploader.trustPoints >= 50) {
-    requiredValidationPoints = 2
+    requiredValidationPoints = 2;
   }
 
   // Auto-approve if uploader is a setter
-  const status = uploader.setter ? 'approved' : 'pending'
-  const currentValidationPoints = uploader.setter ? requiredValidationPoints : 0
+  const status = uploader.setter ? "approved" : "pending";
+  const currentValidationPoints = uploader.setter
+    ? requiredValidationPoints
+    : 0;
 
   return await prisma.boulder.create({
     data: {
@@ -49,11 +50,11 @@ export const createBoulder = async (
       status,
       requiredValidationPoints,
       currentValidationPoints,
-      communityGrade: 'appropriate',
-      communityFeedback: 'neutral',
+      communityGrade: "appropriate",
+      communityFeedback: "neutral",
       colors: {
-        connect: data.colorIds.map(id => ({ id }))
-      }
+        connect: data.colorIds.map((id) => ({ id })),
+      },
     },
     include: {
       wall: {
@@ -63,37 +64,10 @@ export const createBoulder = async (
           gym: {
             select: {
               id: true,
-              name: true
-            }
-          }
-        }
-      },
-      setGrade: true,
-      colors: true,
-      verifiedSetter: {
-        select: {
-          id: true,
-          username: true
-        }
-      },
-      uploadedBy: {
-        select: {
-          id: true,
-          username: true
-        }
-      }
-    }
-  })
-}
-
-export const findBoulderById = async (id: string) => {
-  return await prisma.boulder.findUnique({
-    where: { id },
-    include: {
-      wall: {
-        include: {
-          gym: true
-        }
+              name: true,
+            },
+          },
+        },
       },
       setGrade: true,
       colors: true,
@@ -101,58 +75,86 @@ export const findBoulderById = async (id: string) => {
         select: {
           id: true,
           username: true,
-          setter: true
-        }
+        },
       },
       uploadedBy: {
         select: {
           id: true,
-          username: true
-        }
+          username: true,
+        },
+      },
+    },
+  });
+};
+
+export const findBoulderById = async (id: string) => {
+  return await prisma.boulder.findUnique({
+    where: { id },
+    include: {
+      wall: {
+        include: {
+          gym: true,
+        },
+      },
+      setGrade: true,
+      colors: true,
+      verifiedSetter: {
+        select: {
+          id: true,
+          username: true,
+          setter: true,
+        },
+      },
+      uploadedBy: {
+        select: {
+          id: true,
+          username: true,
+        },
       },
       boulderValidations: {
         include: {
           user: {
             select: {
               id: true,
-              username: true
-            }
-          }
-        }
-      }
-    }
-  })
-}
+              username: true,
+            },
+          },
+        },
+      },
+    },
+  });
+};
 
 export const findAllBoulders = async (filters: {
-  wallId?: string
-  gymId?: string
-  setterId?: string
-  uploadedById?: string
-  status?: string
+  wallId?: string;
+  gymId?: string;
+  setterId?: string;
+  uploadedById?: string;
+  status?: string;
 }) => {
-  const where: any = {}
+  // TODO any, no no no go
+  const where: any = {};
 
   if (filters.wallId) {
-    where.wallId = filters.wallId
+    where.wallId = filters.wallId;
   }
 
   if (filters.gymId) {
     where.wall = {
-      gymId: filters.gymId
-    }
+      gymId: filters.gymId,
+    };
   }
 
   if (filters.setterId) {
-    where.verifiedSetterId = filters.setterId
+    where.verifiedSetterId = filters.setterId;
   }
 
   if (filters.uploadedById) {
-    where.uploadedById = filters.uploadedById
+    where.uploadedById = filters.uploadedById;
   }
 
   if (filters.status) {
-    where.status = filters.status
+    where.status = filters.status;
   }
 
   return await prisma.boulder.findMany({
@@ -165,56 +167,59 @@ export const findAllBoulders = async (filters: {
           gym: {
             select: {
               id: true,
-              name: true
-            }
-          }
-        }
+              name: true,
+            },
+          },
+        },
       },
       setGrade: true,
       colors: true,
       verifiedSetter: {
         select: {
           id: true,
-          username: true
-        }
+          username: true,
+        },
       },
       uploadedBy: {
         select: {
           id: true,
-          username: true
-        }
-      }
+          username: true,
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
-    }
-  })
-}
+      createdAt: "desc",
+    },
+  });
+};
 
-export const updateBoulder = async (id: string, data: {
-  wallId?: string
-  name?: string
-  setGradeId?: string
-  verifiedSetterId?: string
-  unverifiedSetterName?: string
-  colorIds?: string[]
-  status?: string
-}) => {
+export const updateBoulder = async (
+  id: string,
+  data: {
+    wallId?: string;
+    name?: string;
+    setGradeId?: string;
+    verifiedSetterId?: string;
+    unverifiedSetterName?: string;
+    colorIds?: string[];
+    status?: string;
+  },
+) => {
   const updateData: any = {
     wallId: data.wallId,
     name: data.name,
     setGradeId: data.setGradeId,
     verifiedSetterId: data.verifiedSetterId,
     unverifiedSetterName: data.unverifiedSetterName,
-    status: data.status
-  }
+    status: data.status,
+  };
 
   // Handle colors update (many-to-many)
   if (data.colorIds) {
     updateData.colors = {
       set: [], // Clear existing
-      connect: data.colorIds.map(id => ({ id })) // Connect new ones
-    }
+      connect: data.colorIds.map((id) => ({ id })), // Connect new ones
+    };
   }
 
   return await prisma.boulder.update({
@@ -227,21 +232,24 @@ export const updateBoulder = async (id: string, data: {
       verifiedSetter: {
         select: {
           id: true,
-          username: true
-        }
+          username: true,
+        },
       },
       uploadedBy: {
         select: {
           id: true,
-          username: true
-        }
-      }
-    }
-  })
-}
+          username: true,
+        },
+      },
+    },
+  });
+};
 
 export const deleteBoulder = async (id: string) => {
   return await prisma.boulder.delete({
-    where: { id }
-  })
-}
+    where: { id },
+  });
+};
+
+//TODO inconsistency findBoulderById, findAllBoulders, updateBoulder
+//TODO think about delition logic, now everybody can delete without any checks

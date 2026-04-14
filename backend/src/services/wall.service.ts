@@ -1,56 +1,57 @@
-import { prisma } from '#db'
-import type { WallType } from '#db'
+import { prisma } from "#db";
+import type { WallType } from "#db";
 
 export const createWall = async (data: {
-  gymId: string
-  name: string
-  description: string
-  imageUrl: string
-  wallType: WallType[]
-  isActive: boolean
-  lastReset?: Date
+  gymId: string;
+  name: string;
+  description: string;
+  imageUrl: string;
+  wallType: WallType[];
+  isActive: boolean;
+  lastReset?: Date;
 }) => {
   return await prisma.wall.create({
     data: {
       ...data,
-      lastReset: data.lastReset || new Date()
-    }
-  })
-}
+      lastReset: data.lastReset || new Date(),
+    },
+  });
+};
 
+// TODO addd more data to render
 export const findWallById = async (id: string) => {
   return await prisma.wall.findUnique({
     where: { id },
     include: {
       gym: true,
-      boulders: true
-    }
-  })
-}
+      boulders: true,
+    },
+  });
+};
 
 export const findAllWalls = async (filters: {
-  gymId?: string
-  city?: string
-  setterId?: string
+  gymId?: string;
+  city?: string;
+  setterId?: string;
 }) => {
-  const where: any = {}
+  const where: any = {};
 
   if (filters.gymId) {
-    where.gymId = filters.gymId
+    where.gymId = filters.gymId;
   }
 
   if (filters.city) {
     where.gym = {
-      city: filters.city
-    }
+      city: filters.city,
+    };
   }
 
   if (filters.setterId) {
     where.boulders = {
       some: {
-        verifiedSetterId: filters.setterId
-      }
-    }
+        verifiedSetterId: filters.setterId,
+      },
+    };
   }
 
   return await prisma.wall.findMany({
@@ -60,37 +61,41 @@ export const findAllWalls = async (filters: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
+          city: true,
+        },
       },
       boulders: {
         select: {
           id: true,
           name: true,
-          verifiedSetterId: true
-        }
-      }
-    }
-  })
-}
+          verifiedSetterId: true,
+        },
+      },
+    },
+  });
+};
 
-export const updateWall = async (id: string, data: {
-  gymId?: string
-  name?: string
-  description?: string
-  imageUrl?: string
-  wallType?: WallType[]
-  isActive?: boolean
-  lastReset?: Date
-}) => {
+export const updateWall = async (
+  id: string,
+  data: {
+    gymId?: string;
+    name?: string;
+    description?: string;
+    imageUrl?: string;
+    wallType?: WallType[];
+    isActive?: boolean;
+    lastReset?: Date;
+  },
+) => {
   return await prisma.wall.update({
     where: { id },
-    data
-  })
-}
+    data,
+  });
+};
 
+// TODO no protection, everybody can delete
 export const deleteWall = async (id: string) => {
   return await prisma.wall.delete({
-    where: { id }
-  })
-}
+    where: { id },
+  });
+};
