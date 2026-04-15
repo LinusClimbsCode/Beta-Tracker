@@ -17,13 +17,6 @@ export const createGradeController = async (req: Request, res: Response) => {
 
 export const getGradeController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   const grade = await findGradeById(id);
 
@@ -58,13 +51,6 @@ export const getAllGradesController = async (req: Request, res: Response) => {
 export const updateGradeController = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   const grade = await updateGrade(id, data);
 
@@ -76,13 +62,6 @@ export const updateGradeController = async (req: Request, res: Response) => {
 
 export const deleteGradeController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   await deleteGrade(id);
 

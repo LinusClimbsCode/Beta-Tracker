@@ -18,13 +18,6 @@ export const createColorController = async (req: Request, res: Response) => {
 
 export const getColorController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   const color = await findColorById(id);
 
@@ -55,13 +48,6 @@ export const getAllColorsController = async (req: Request, res: Response) => {
 export const updateColorController = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   const color = await updateColor(id, data);
 
@@ -73,13 +59,6 @@ export const updateColorController = async (req: Request, res: Response) => {
 
 export const deleteColorController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   await deleteColor(id);
 

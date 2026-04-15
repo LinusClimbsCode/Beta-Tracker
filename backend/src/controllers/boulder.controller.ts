@@ -23,16 +23,8 @@ export const createBoulderController = async (req: Request, res: Response) => {
   });
 };
 
-// TODO BUG if(!id) will never happen
 export const getBoulderController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   const boulder = await findBoulderById(id);
 
@@ -77,32 +69,17 @@ export const getAllBouldersController = async (req: Request, res: Response) => {
 export const updateBoulderController = async (req: Request, res: Response) => {
   const { id } = req.params;
   const data = req.body;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
-    const boulder = await updateBoulder(id, data);
-    res.json({
-      success: true,
-      boulder,
-    });
-  }
+  const boulder = await updateBoulder(id, data);
+  res.json({
+    success: true,
+    boulder,
+  });
 };
 
 // TODO think about the deletion system, how to prefent from trolls
 export const deleteBoulderController = async (req: Request, res: Response) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   await deleteBoulder(id);
 
