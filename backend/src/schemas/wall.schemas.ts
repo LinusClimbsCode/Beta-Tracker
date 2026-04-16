@@ -10,7 +10,9 @@ export const createWallSchema = z
     isActive: z.boolean({ message: "isActive must be a boolean" }),
     lastReset: z.coerce
       .date()
-      .max(new Date(), { message: "Cannot set future date" })
+      .refine((d: Date) => d <= new Date(), {
+        message: "Cannot set future date",
+      })
       .optional(),
   })
   .strict();
@@ -27,7 +29,9 @@ export const updateWallSchema = z
     isActive: z.boolean().optional(),
     lastReset: z.coerce
       .date()
-      .max(new Date(), { message: "Cannot set future date" })
+      .refine((d: Date) => d <= new Date(), {
+        message: "Cannot set future date",
+      })
       .optional(),
   })
   .strict();
@@ -37,4 +41,3 @@ export const wallQuerySchema = z.object({
   city: z.string().min(2).optional(),
   setterId: z.string().cuid({ message: "Invalid setter ID" }).optional(),
 });
-// TODO fix check per request

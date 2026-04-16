@@ -6,6 +6,7 @@ import {
   updateBoulder,
   deleteBoulder,
 } from "#services";
+import { boulderQuerySchema } from "#schemas";
 
 export const createBoulderController = async (req: Request, res: Response) => {
   if (!req.user) {
@@ -43,7 +44,12 @@ export const getBoulderController = async (req: Request, res: Response) => {
 };
 
 export const getAllBouldersController = async (req: Request, res: Response) => {
-  const { wallId, gymId, setterId, uploadedById, status } = req.query as {
+  const result = boulderQuerySchema.safeParse(req.query);
+  if (!result.success) {
+    res.status(400).json({ success: false, errors: result.error.issues });
+    return;
+  }
+  const { wallId, gymId, setterId, uploadedById, status } = result.data as {
     wallId?: string;
     gymId?: string;
     setterId?: string;
