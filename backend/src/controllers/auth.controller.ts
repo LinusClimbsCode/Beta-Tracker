@@ -30,7 +30,6 @@ const getTokenExpiry = (): TokenEssentials => {
 };
 
 // bussiness logic
-// TODO like loginController, think about error logic
 export const registerController = async (req: Request, res: Response) => {
   const { email, password, username, name, city } = req.body;
   const { refreshTokenExpiresAt, accessTokenExpiresAt, secureCookie } =
@@ -62,7 +61,6 @@ export const registerController = async (req: Request, res: Response) => {
     });
 };
 
-// TODO no try catch, think aboout the error handling aain
 export const loginController = async (req: Request, res: Response) => {
   const { email, password } = req.body;
   const { refreshTokenExpiresAt, accessTokenExpiresAt, secureCookie } =
