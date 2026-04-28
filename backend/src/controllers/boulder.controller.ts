@@ -7,6 +7,7 @@ import {
   deleteBoulder,
 } from "#services";
 import { boulderQuerySchema } from "#schemas";
+import type { ValidationStatus } from "#db";
 
 export const createBoulderController = async (req: Request, res: Response) => {
   if (!req.user) {
@@ -57,7 +58,7 @@ export const getAllBouldersController = async (req: Request, res: Response) => {
     gymId?: string;
     setterId?: string;
     uploadedById?: string;
-    status?: string;
+    status?: ValidationStatus;
   };
 
   const boulders = await findAllBoulders({

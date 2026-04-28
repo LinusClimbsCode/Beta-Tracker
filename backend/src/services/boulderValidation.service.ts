@@ -1,5 +1,5 @@
 import { prisma } from "#db";
-import type { Validation } from "#db";
+import type { Validation, ValidationStatus } from "#db";
 
 export const validateBoulder = async (
   data: {
@@ -12,7 +12,9 @@ export const validateBoulder = async (
   const boulder = await prisma.boulder.findUnique({
     where: { id: data.boulderId },
     include: {
-      boulderValidations: true,
+      boulderValidations: {
+        include: { user: { select: { id: true, validationPower: true } } },
+      },
       uploadedBy: {
         select: { id: true },
       },
@@ -150,11 +152,6 @@ export const validateBoulder = async (
           validationPower: true,
         },
       },
-      boulder: {
-        include: {
-          boulderValidations: true,
-        },
-      },
     },
   });
 
@@ -180,7 +177,7 @@ export const validateBoulder = async (
   }
 
   // 9. Determine new status
-  let newStatus = boulder.status;
+  let newStatus: ValidationStatus = boulder.status;
   let statusMessage = "";
 
   if (data.validation === "approve") {

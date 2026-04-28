@@ -1,5 +1,5 @@
 import { prisma } from "#db";
-import { Prisma } from "../generated/prisma/client";
+import { Prisma, ValidationStatus } from "../generated/prisma/client";
 
 export const createBoulder = async (
   data: {
@@ -131,7 +131,7 @@ export const findAllBoulders = async (filters: {
   gymId?: string;
   setterId?: string;
   uploadedById?: string;
-  status?: string;
+  status?: ValidationStatus;
 }) => {
   // TODO any, no no no go
   const where: Prisma.BoulderWhereInput = {};

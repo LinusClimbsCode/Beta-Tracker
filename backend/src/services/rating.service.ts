@@ -20,7 +20,7 @@ const calculateMostCommon = (ratings: string[]): string => {
     }
   }
 
-  return mostCommon;
+  return mostCommon ?? "appropriate";
 };
 
 export const createRating = async (
