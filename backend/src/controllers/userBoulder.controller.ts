@@ -27,7 +27,10 @@ export const createUserBoulderController = async (
   });
 };
 
-export const getUserBoulderController = async (req: Request, res: Response) => {
+export const getUserBoulderController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const userBoulder = await getUserBoulderById(id);
@@ -76,7 +79,7 @@ export const getUserBouldersController = async (
 };
 
 export const updateUserBoulderController = async (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
 ) => {
   if (!req.user) {
@@ -98,7 +101,7 @@ export const updateUserBoulderController = async (
 };
 
 export const deleteUserBoulderController = async (
-  req: Request,
+  req: Request<{ id: string }>,
   res: Response,
 ) => {
   if (!req.user) {

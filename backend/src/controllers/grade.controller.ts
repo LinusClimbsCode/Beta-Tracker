@@ -15,7 +15,10 @@ export const createGradeController = async (req: Request, res: Response) => {
   });
 };
 
-export const getGradeController = async (req: Request, res: Response) => {
+export const getGradeController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const grade = await findGradeById(id);
@@ -48,7 +51,10 @@ export const getAllGradesController = async (req: Request, res: Response) => {
   });
 };
 
-export const updateGradeController = async (req: Request, res: Response) => {
+export const updateGradeController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
   const data = req.body;
 
@@ -60,7 +66,10 @@ export const updateGradeController = async (req: Request, res: Response) => {
   });
 };
 
-export const deleteGradeController = async (req: Request, res: Response) => {
+export const deleteGradeController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   await deleteGrade(id);

@@ -17,7 +17,10 @@ export const createWallController = async (req: Request, res: Response) => {
   });
 };
 
-export const getWallController = async (req: Request, res: Response) => {
+export const getWallController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const wall = await findWallById(id);
@@ -52,7 +55,10 @@ export const getAllWallsController = async (req: Request, res: Response) => {
   });
 };
 
-export const updateWallController = async (req: Request, res: Response) => {
+export const updateWallController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
   const data = req.body;
 
@@ -64,8 +70,18 @@ export const updateWallController = async (req: Request, res: Response) => {
   });
 };
 
-export const deleteWallController = async (req: Request, res: Response) => {
+export const deleteWallController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
+  if (!id) {
+    res.status(404).json({
+      success: false,
+      message: "No valid Id",
+    });
+    return;
+  }
 
   await deleteWall(id);
 

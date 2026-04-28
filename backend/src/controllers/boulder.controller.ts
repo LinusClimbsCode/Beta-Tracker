@@ -24,7 +24,10 @@ export const createBoulderController = async (req: Request, res: Response) => {
   });
 };
 
-export const getBoulderController = async (req: Request, res: Response) => {
+export const getBoulderController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const boulder = await findBoulderById(id);
@@ -72,7 +75,10 @@ export const getAllBouldersController = async (req: Request, res: Response) => {
   });
 };
 
-export const updateBoulderController = async (req: Request, res: Response) => {
+export const updateBoulderController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
   const data = req.body;
 
@@ -84,10 +90,13 @@ export const updateBoulderController = async (req: Request, res: Response) => {
 };
 
 // TODO think about the deletion system, how to prefent from trolls
-export const deleteBoulderController = async (req: Request, res: Response) => {
+export const deleteBoulderController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
-  await deleteBoulder(id);
+  await deleteBoulder(id, req.user.id);
 
   res.json({
     success: true,

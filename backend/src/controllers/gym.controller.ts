@@ -17,7 +17,10 @@ export const createGymController = async (req: Request, res: Response) => {
   });
 };
 
-export const getGymController = async (req: Request, res: Response) => {
+export const getGymController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const gym = await findGymById(id);
@@ -45,7 +48,10 @@ export const getAllGymsController = async (_req: Request, res: Response) => {
   });
 };
 
-export const updateGymController = async (req: Request, res: Response) => {
+export const updateGymController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
   const data = req.body;
 
@@ -57,7 +63,10 @@ export const updateGymController = async (req: Request, res: Response) => {
   });
 };
 
-export const deleteGymController = async (req: Request, res: Response) => {
+export const deleteGymController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   await deleteGym(id);

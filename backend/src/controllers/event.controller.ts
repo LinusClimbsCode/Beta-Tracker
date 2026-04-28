@@ -16,7 +16,10 @@ export const createEventController = async (req: Request, res: Response) => {
   });
 };
 
-export const getEventController = async (req: Request, res: Response) => {
+export const getEventController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const event = await findEventById(id);
@@ -55,7 +58,10 @@ export const getAllEventsController = async (req: Request, res: Response) => {
   });
 };
 
-export const updateEventController = async (req: Request, res: Response) => {
+export const updateEventController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
   const data = req.body;
 
@@ -67,8 +73,18 @@ export const updateEventController = async (req: Request, res: Response) => {
   });
 };
 
-export const deleteEventController = async (req: Request, res: Response) => {
+export const deleteEventController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
+  if (!id) {
+    res.status(404).json({
+      success: false,
+      message: "No valid Id",
+    });
+    return;
+  }
 
   await deleteEvent(id);
 

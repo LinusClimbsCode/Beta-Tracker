@@ -16,7 +16,10 @@ export const createColorController = async (req: Request, res: Response) => {
   });
 };
 
-export const getColorController = async (req: Request, res: Response) => {
+export const getColorController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   const color = await findColorById(id);
@@ -45,7 +48,10 @@ export const getAllColorsController = async (req: Request, res: Response) => {
   });
 };
 
-export const updateColorController = async (req: Request, res: Response) => {
+export const updateColorController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
   const data = req.body;
 
@@ -57,7 +63,10 @@ export const updateColorController = async (req: Request, res: Response) => {
   });
 };
 
-export const deleteColorController = async (req: Request, res: Response) => {
+export const deleteColorController = async (
+  req: Request<{ id: string }>,
+  res: Response,
+) => {
   const { id } = req.params;
 
   await deleteColor(id);
