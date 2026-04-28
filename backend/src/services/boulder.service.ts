@@ -1,4 +1,5 @@
 import { prisma } from "#db";
+import { Prisma } from "../generated/prisma/client";
 
 export const createBoulder = async (
   data: {
@@ -133,7 +134,7 @@ export const findAllBoulders = async (filters: {
   status?: string;
 }) => {
   // TODO any, no no no go
-  const where: any = {};
+  const where: Prisma.BoulderWhereInput = {};
 
   if (filters.wallId) {
     where.wallId = filters.wallId;
@@ -245,10 +246,17 @@ export const updateBoulder = async (
   });
 };
 
-export const deleteBoulder = async (id: string) => {
-  return await prisma.boulder.delete({
-    where: { id },
-  });
+export const deleteBoulder = async (id: string, userId: string) => {
+  const boulder = await findBoulderById(id);
+  if (!boulder) {
+    throw new Error("Boulder not found");
+  } else if (boulder.uploadedById !== userId) {
+    throw new Error("You are not authorised");
+  } else {
+    return await prisma.boulder.delete({
+      where: { id },
+    });
+  }
 };
 
 //TODO inconsistency findBoulderById, findAllBoulders, updateBoulder

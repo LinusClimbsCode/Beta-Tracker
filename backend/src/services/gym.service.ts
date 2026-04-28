@@ -1,5 +1,6 @@
 import { prisma } from "#db";
 import type { Prisma } from "#db";
+import type { GradeSystemType } from "#db";
 
 export const createGym = async (data: Prisma.GymCreateInput) => {
   return await prisma.gym.create({
@@ -12,8 +13,12 @@ export const findGymById = async (id: string) => {
     where: { id },
     include: {
       walls: true,
-      moderator: {
-        select: { id: true, username: true },
+      moderators: {
+        include: {
+          moderator: {
+            select: { id: true, username: true },
+          },
+        },
       },
     },
   });
@@ -32,10 +37,24 @@ export const findAllGyms = async () => {
     },
   });
 };
-// TODO update updateGym with website, phone etc
+
+// isActive think about solution if everybody
+// or only admin/moderator can change it
 export const updateGym = async (
   id: string,
-  data: { name?: string; city?: string; address?: string },
+  data: {
+    name?: string;
+    city?: string;
+    address?: string;
+    website?: string;
+    phone?: string;
+    email?: string;
+    openingHours?: Prisma.InputJsonValue;
+    description?: string;
+    priceInfo?: Prisma.InputJsonValue;
+    imageUrl?: string;
+    gradeSystemType?: GradeSystemType;
+  },
 ) => {
   return await prisma.gym.update({
     where: { id },
