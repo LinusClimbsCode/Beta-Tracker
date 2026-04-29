@@ -42,6 +42,18 @@ export const findUserById = async (id: string): Promise<User | null> => {
   return user;
 };
 
+export const findUserByUsername = async (
+  username: string,
+): Promise<User | null> => {
+  const user = await prisma.user.findUnique({
+    where: {
+      username,
+    },
+  });
+
+  return user;
+};
+
 export const createUser = async (
   email: string,
   password: string,
@@ -66,4 +78,43 @@ export const createUser = async (
   return user;
 };
 
-// TODO updateUser, getUserStatus, findUserByUsername
+export const updateUser = async (
+  id: string,
+  data: {
+    name?: string;
+    city?: string;
+    bio?: string;
+    profilePicture?: string;
+  },
+) => {
+  return await prisma.user.update({
+    where: { id },
+    data,
+  });
+};
+
+export const getUserStats = async (id: string) => {
+  const user = await prisma.user.findUnique({
+    where: { id },
+    select: {
+      id: true,
+      username: true,
+      name: true,
+      city: true,
+      experiencePoints: true,
+      trustPoints: true,
+      validationPower: true,
+      _count: {
+        select: {
+          uploadedBoulders: true,
+          userBoulders: true,
+          boulderValidations: true,
+        },
+      },
+    },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  return user;
+};
