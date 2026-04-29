@@ -1,5 +1,6 @@
 import { prisma } from "#db";
 import type { WallType } from "#db";
+import type { WallWhereInput } from "#generated/prisma/models";
 
 export const createWall = async (data: {
   gymId: string;
@@ -24,7 +25,9 @@ export const findWallById = async (id: string) => {
     where: { id },
     include: {
       gym: true,
-      boulders: true,
+      boulders: {
+        include: { setGrade: true, colors: true },
+      },
     },
   });
 };
@@ -34,7 +37,7 @@ export const findAllWalls = async (filters: {
   city?: string;
   setterId?: string;
 }) => {
-  const where: any = {};
+  const where: WallWhereInput = {};
 
   if (filters.gymId) {
     where.gymId = filters.gymId;

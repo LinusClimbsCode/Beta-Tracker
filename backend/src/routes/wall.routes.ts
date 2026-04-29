@@ -1,20 +1,25 @@
-import { Router } from 'express'
+import { Router } from "express";
 import {
   createWallController,
   getWallController,
   getAllWallsController,
   updateWallController,
-  deleteWallController
-} from '#controllers'
-import { requireAuth, validateCreateWall, validateUpdateWall, validateWallQuery } from '#middleware'
+  deleteWallController,
+} from "#controllers";
+import {
+  requireAdmin,
+  requireAuth,
+  validateCreateWall,
+  validateUpdateWall,
+} from "#middleware";
 
-export const wallRouter = Router()
+export const wallRouter = Router();
 
 // Public
-wallRouter.get('/', getAllWallsController)
-wallRouter.get('/:id', getWallController)
+wallRouter.get("/", getAllWallsController);
+wallRouter.get("/:id", getWallController);
 
 // Protected
-wallRouter.post('/', requireAuth, validateCreateWall, createWallController)
-wallRouter.patch('/:id', requireAuth, validateUpdateWall, updateWallController)
-wallRouter.delete('/:id', requireAuth, deleteWallController)
+wallRouter.post("/", requireAuth, validateCreateWall, createWallController);
+wallRouter.patch("/:id", requireAuth, validateUpdateWall, updateWallController);
+wallRouter.delete("/:id", requireAdmin, deleteWallController);
