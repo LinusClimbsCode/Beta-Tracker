@@ -1,17 +1,18 @@
-import { prisma } from '#db'
-import type { EventType } from '#db'
+import { prisma } from "#db";
+import type { EventType } from "#db";
+import type { Prisma } from "../generated/prisma/client";
 
 export const createEvent = async (data: {
-  gymId: string
-  title: string
-  eventType: EventType[]
-  description: string
-  imageUrl?: string
-  startTime: string
-  endTime: string
-  price: string
-  registrationLink: string
-  isActive: boolean
+  gymId: string;
+  title: string;
+  eventType: EventType[];
+  description: string;
+  imageUrl?: string;
+  startTime: string;
+  endTime: string;
+  price: string;
+  registrationLink: string;
+  isActive: boolean;
 }) => {
   return await prisma.event.create({
     data,
@@ -20,12 +21,12 @@ export const createEvent = async (data: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
-    }
-  })
-}
+          city: true,
+        },
+      },
+    },
+  });
+};
 
 export const findEventById = async (id: string) => {
   return await prisma.event.findUnique({
@@ -36,32 +37,32 @@ export const findEventById = async (id: string) => {
           id: true,
           name: true,
           city: true,
-          address: true
-        }
-      }
-    }
-  })
-}
+          address: true,
+        },
+      },
+    },
+  });
+};
 
 export const findAllEvents = async (filters: {
-  gymId?: string
-  city?: string
-  isActive?: boolean
+  gymId?: string;
+  city?: string;
+  isActive?: boolean;
 }) => {
-  const where: any = {}
+  const where: Prisma.EventWhereInput = {};
 
   if (filters.gymId) {
-    where.gymId = filters.gymId
+    where.gymId = filters.gymId;
   }
 
   if (filters.city) {
     where.gym = {
-      city: filters.city
-    }
+      city: filters.city,
+    };
   }
 
   if (filters.isActive !== undefined) {
-    where.isActive = filters.isActive
+    where.isActive = filters.isActive;
   }
 
   return await prisma.event.findMany({
@@ -71,28 +72,31 @@ export const findAllEvents = async (filters: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
+          city: true,
+        },
+      },
     },
     orderBy: {
-      createdAt: 'desc'
-    }
-  })
-}
+      startTime: "asc",
+    },
+  });
+};
 
-export const updateEvent = async (id: string, data: {
-  gymId?: string
-  title?: string
-  eventType?: EventType[]
-  description?: string
-  imageUrl?: string
-  startTime?: string
-  endTime?: string
-  price?: string
-  registrationLink?: string
-  isActive?: boolean
-}) => {
+export const updateEvent = async (
+  id: string,
+  data: {
+    gymId?: string;
+    title?: string;
+    eventType?: EventType[];
+    description?: string;
+    imageUrl?: string;
+    startTime?: string;
+    endTime?: string;
+    price?: string;
+    registrationLink?: string;
+    isActive?: boolean;
+  },
+) => {
   return await prisma.event.update({
     where: { id },
     data,
@@ -101,15 +105,15 @@ export const updateEvent = async (id: string, data: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
-    }
-  })
-}
+          city: true,
+        },
+      },
+    },
+  });
+};
 
 export const deleteEvent = async (id: string) => {
   return await prisma.event.delete({
-    where: { id }
-  })
-}
+    where: { id },
+  });
+};
