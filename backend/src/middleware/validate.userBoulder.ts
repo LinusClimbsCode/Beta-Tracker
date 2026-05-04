@@ -15,6 +15,7 @@ export const validateCreateUserBoulder = (
     return;
   }
 
+  req.body = result.data;
   next();
 };
 
@@ -31,5 +32,7 @@ export const validateUpdateUserBoulder = (
     });
     return;
   }
+
+  req.body = result.data;
   next();
 };

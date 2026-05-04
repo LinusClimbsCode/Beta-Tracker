@@ -17,6 +17,7 @@ export const validateCreateBoulder = (
     return;
   }
 
+  req.body = result.data;
   next();
 };
 
@@ -36,5 +37,6 @@ export const validateUpdateBoulder = (
     return;
   }
 
+  req.body = result.data;
   next();
 };

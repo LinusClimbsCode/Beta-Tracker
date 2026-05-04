@@ -16,6 +16,7 @@ export const validateCreateGrade = (
     return;
   }
 
+  req.body = result.data;
   next();
 };
 
@@ -34,5 +35,6 @@ export const validateUpdateGrade = (
     return;
   }
 
+  req.body = result.data;
   next();
 };

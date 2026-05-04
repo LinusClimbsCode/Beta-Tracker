@@ -16,6 +16,7 @@ export const validateCreateColor = (
     return;
   }
 
+  req.body = result.data;
   next();
 };
 
@@ -34,5 +35,6 @@ export const validateUpdateColor = (
     return;
   }
 
+  req.body = result.data;
   next();
 };

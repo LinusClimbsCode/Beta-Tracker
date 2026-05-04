@@ -16,6 +16,7 @@ export const validateCreateGym = (
     return;
   }
 
+  req.body = result.data;
   next();
 };
 
@@ -34,5 +35,6 @@ export const validateUpdateGym = (
     return;
   }
 
+  req.body = result.data;
   next();
 };
