@@ -86,7 +86,7 @@ export const deleteEventController = async (
   res: Response,
 ) => {
   if (!req.user) {
-    res.status(404).json({
+    res.status(401).json({
       success: false,
       message: "No valid User",
     });

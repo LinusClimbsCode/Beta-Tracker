@@ -95,6 +95,14 @@ export const deleteBoulderController = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
+  if (!req.user) {
+    res.status(401).json({
+      success: false,
+      message: "No valid User",
+    });
+    return;
+  }
+
   const { id } = req.params;
 
   await deleteBoulder(id, req.user.id);

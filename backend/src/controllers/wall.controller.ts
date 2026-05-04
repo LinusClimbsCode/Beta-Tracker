@@ -6,7 +6,6 @@ import {
   updateWall,
   deleteWall,
 } from "#services";
-import { success } from "zod";
 
 export const createWallController = async (req: Request, res: Response) => {
   const wall = await createWall(req.body);
@@ -75,13 +74,6 @@ export const deleteWallController = async (
   res: Response,
 ) => {
   const { id } = req.params;
-  if (!id) {
-    res.status(404).json({
-      success: false,
-      message: "No valid Id",
-    });
-    return;
-  }
 
   await deleteWall(id);
 

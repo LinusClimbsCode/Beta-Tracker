@@ -34,14 +34,6 @@ export const getBoulderValidationsController = async (
 ) => {
   const { boulderId } = req.params;
 
-  if (!boulderId) {
-    res.status(400).json({
-      success: false,
-      message: "Boulder ID is required",
-    });
-    return;
-  }
-
   const validations = await getBoulderValidations(boulderId);
 
   res.json({
