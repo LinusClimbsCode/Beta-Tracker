@@ -123,6 +123,7 @@ model User {
   setterConfirmations SetterConfirmation[]
   userBoulders        UserBoulder[]
   userArchives        UserArchive[]
+  events Event[]
   createdAt           DateTime             @default(now())
   updatedAt           DateTime             @updatedAt
   lastLoginAt         DateTime             @default(now())
@@ -195,6 +196,7 @@ model Color {
 model Event {
   id               String      @id @default(cuid())
   gymId            String
+  createdById            String
   title            String
   eventType        EventType[]
   description      String
@@ -205,6 +207,7 @@ model Event {
   registrationLink String
   isActive         Boolean
   gym              Gym         @relation(fields: [gymId], references: [id])
+  createdBy              User         @relation(fields: [createdById], references: [id])
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 }

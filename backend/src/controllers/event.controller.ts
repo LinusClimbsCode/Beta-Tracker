@@ -8,7 +8,15 @@ import {
 } from "#services";
 
 export const createEventController = async (req: Request, res: Response) => {
-  const event = await createEvent(req.body);
+  if (!req.user) {
+    res.status(401).json({ success: false, message: "Not authenticated" });
+    return;
+  }
+
+  const event = await createEvent({
+    ...req.body,
+    createdById: req.user.id,
+  });
 
   res.status(201).json({
     success: true,
@@ -77,16 +85,17 @@ export const deleteEventController = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
-  const { id } = req.params;
-  if (!id) {
+  if (!req.user) {
     res.status(404).json({
       success: false,
-      message: "No valid Id",
+      message: "No valid User",
     });
     return;
   }
 
-  await deleteEvent(id);
+  const { id } = req.params;
+
+  await deleteEvent(id, req.user.id);
 
   res.json({
     success: true,

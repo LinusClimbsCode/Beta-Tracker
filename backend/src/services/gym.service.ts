@@ -62,7 +62,6 @@ export const updateGym = async (
   });
 };
 
-// TODO admin only
 export const deleteGym = async (id: string) => {
   return await prisma.gym.delete({
     where: { id },

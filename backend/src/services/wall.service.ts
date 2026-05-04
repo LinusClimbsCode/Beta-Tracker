@@ -96,7 +96,6 @@ export const updateWall = async (
   });
 };
 
-// TODO no protection, everybody can delete
 export const deleteWall = async (id: string) => {
   return await prisma.wall.delete({
     where: { id },

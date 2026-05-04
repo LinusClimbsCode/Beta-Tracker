@@ -4,6 +4,7 @@ import type { Prisma } from "../generated/prisma/client";
 
 export const createEvent = async (data: {
   gymId: string;
+  createdById: string;
   title: string;
   eventType: EventType[];
   description: string;
@@ -112,8 +113,15 @@ export const updateEvent = async (
   });
 };
 
-export const deleteEvent = async (id: string) => {
-  return await prisma.event.delete({
-    where: { id },
-  });
+export const deleteEvent = async (id: string, userId: string) => {
+  const event = await findEventById(id);
+  if (!event) {
+    throw new Error("Event not found");
+  } else if (event.createdById !== userId) {
+    throw new Error("You are not authorised");
+  } else {
+    return await prisma.event.delete({
+      where: { id },
+    });
+  }
 };

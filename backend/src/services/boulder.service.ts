@@ -203,10 +203,10 @@ export const updateBoulder = async (
     verifiedSetterId?: string;
     unverifiedSetterName?: string;
     colorIds?: string[];
-    status?: string;
+    status?: ValidationStatus;
   },
 ) => {
-  const updateData: any = {
+  const updateData: Prisma.BoulderUncheckedUpdateInput = {
     wallId: data.wallId,
     name: data.name,
     setGradeId: data.setGradeId,
