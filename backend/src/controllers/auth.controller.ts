@@ -173,18 +173,3 @@ export const logoutController = async (req: Request, res: Response) => {
       success: true,
     });
 };
-
-export const getMeController = async (req: Request, res: Response) => {
-  if (!req.user) {
-    res.status(401).json({
-      success: false,
-      message: "Not authenticated",
-    });
-    return;
-  }
-
-  res.status(200).json({
-    success: true,
-    user: req.user,
-  });
-};

@@ -12,6 +12,7 @@ import {
   boulderValidationRouter,
   userBoulderRouter,
   ratingRouter,
+  userRouter,
 } from "#routes";
 import cookieParser from "cookie-parser";
 import { requireAuth } from "#middleware/auth.middleware";
@@ -38,6 +39,7 @@ app.get("/", (_req, res) => res.send("hello world!"));
 
 // routes
 app.use("/auth", authRouter);
+app.use("/user", userRouter);
 app.use("/gym", gymRouter);
 app.use("/wall", wallRouter);
 app.use("/color", colorRouter);
@@ -47,8 +49,6 @@ app.use("/boulder", boulderRouter);
 app.use("/validation", boulderValidationRouter);
 app.use("/user-boulder", userBoulderRouter);
 app.use("/rating", ratingRouter);
-
-// TODO add user route
 
 // test, debug route
 app.get("/protected", requireAuth, (req, res) => {
