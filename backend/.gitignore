@@ -26,11 +26,7 @@ Thumbs.db
 *.swo
 *~
 
-# Prisma
-prisma/migrations/
-# Keep schema.prisma and seed.ts!
-
-# Uploads (falls du lokale File-Uploads machst)
+# Uploads 
 uploads/
 temp/
 
