@@ -2,6 +2,12 @@ import type { Request, Response, NextFunction } from "express";
 import { ZodError } from "zod";
 import { Prisma } from "../generated/prisma/client";
 import { config } from "#config";
+import {
+  NotFoundError,
+  ForbiddenError,
+  ConflictError,
+  UnauthorizedError,
+} from "#errors";
 
 export const errorHandler = (
   error: Error,
@@ -45,6 +51,19 @@ export const errorHandler = (
       });
       return;
     }
+  }
+
+  if (
+    error instanceof NotFoundError ||
+    error instanceof ForbiddenError ||
+    error instanceof ConflictError ||
+    error instanceof UnauthorizedError
+  ) {
+    res.status(error.statusCode).json({
+      success: false,
+      message: error.message,
+    });
+    return;
   }
 
   // Default error

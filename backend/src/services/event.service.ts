@@ -1,6 +1,7 @@
 import { prisma } from "#db";
 import type { EventType } from "#db";
 import type { Prisma } from "../generated/prisma/client";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "#errors";
 
 export const createEvent = async (data: {
   gymId: string;
@@ -85,6 +86,7 @@ export const findAllEvents = async (filters: {
 
 export const updateEvent = async (
   id: string,
+  userId: string,
   data: {
     gymId?: string;
     title?: string;
@@ -98,27 +100,34 @@ export const updateEvent = async (
     isActive?: boolean;
   },
 ) => {
-  return await prisma.event.update({
-    where: { id },
-    data,
-    include: {
-      gym: {
-        select: {
-          id: true,
-          name: true,
-          city: true,
+  const event = await findEventById(id);
+  if (!event) {
+    throw new NotFoundError("Event not found");
+  } else if (event.createdById !== userId) {
+    throw new ForbiddenError("You are not authorised");
+  } else {
+    return await prisma.event.update({
+      where: { id },
+      data,
+      include: {
+        gym: {
+          select: {
+            id: true,
+            name: true,
+            city: true,
+          },
         },
       },
-    },
-  });
+    });
+  }
 };
 
 export const deleteEvent = async (id: string, userId: string) => {
   const event = await findEventById(id);
   if (!event) {
-    throw new Error("Event not found");
+    throw new NotFoundError("Event not found");
   } else if (event.createdById !== userId) {
-    throw new Error("You are not authorised");
+    throw new ForbiddenError("You are not authorised");
   } else {
     return await prisma.event.delete({
       where: { id },

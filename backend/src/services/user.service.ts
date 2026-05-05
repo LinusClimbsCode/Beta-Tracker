@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { prisma } from "#db";
 
 import type { User } from "#db";
+import { ConflictError, NotFoundError } from "#errors";
 
 // Helper Functions:
 const hashPassword = async (password: string): Promise<string> => {
@@ -62,7 +63,7 @@ export const createUser = async (
   city: string,
 ): Promise<User> => {
   if (await findUserByEmail(email)) {
-    throw new Error("user already exist!");
+    throw new ConflictError("user already exist!");
   }
   const passwordHash = await hashPassword(password);
   const user = await prisma.user.create({
@@ -114,7 +115,7 @@ export const getUserStats = async (id: string) => {
     },
   });
 
-  if (!user) throw new Error("User not found");
+  if (!user) throw new NotFoundError("User not found");
 
   return user;
 };

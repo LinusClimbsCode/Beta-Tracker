@@ -1,4 +1,5 @@
 import { prisma } from "#db";
+import { ForbiddenError, NotFoundError, UnauthorizedError } from "#errors";
 import { Prisma, ValidationStatus } from "../generated/prisma/client";
 
 export const createBoulder = async (
@@ -19,11 +20,11 @@ export const createBoulder = async (
   });
 
   if (!uploader) {
-    throw new Error("Uploader not found");
+    throw new NotFoundError("Uploader not found");
   }
 
   if (!uploader.emailVerified) {
-    throw new Error("Email must be verified to upload boulders");
+    throw new ForbiddenError("Email must be verified to upload boulders");
   }
 
   // Calculate required validation points based on uploader's trust points
@@ -249,9 +250,9 @@ export const updateBoulder = async (
 export const deleteBoulder = async (id: string, userId: string) => {
   const boulder = await findBoulderById(id);
   if (!boulder) {
-    throw new Error("Boulder not found");
+    throw new NotFoundError("Boulder not found");
   } else if (boulder.uploadedById !== userId) {
-    throw new Error("You are not authorised");
+    throw new ForbiddenError("You are not authorised");
   } else {
     return await prisma.boulder.delete({
       where: { id },

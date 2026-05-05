@@ -1,5 +1,11 @@
 import { prisma } from "#db";
 import type { GradeRating, QualityRating } from "#db";
+import {
+  ConflictError,
+  ForbiddenError,
+  NotFoundError,
+  UnauthorizedError,
+} from "#errors";
 
 // Helper function to calculate most common rating
 const calculateMostCommon = (ratings: string[]): string => {
@@ -39,11 +45,11 @@ export const createRating = async (
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new NotFoundError("User not found");
   }
 
   if (!user.emailVerified) {
-    throw new Error("Email must be verified to rate boulders");
+    throw new ForbiddenError("Email must be verified to rate boulders");
   }
 
   // Check if user has climbed the boulder
@@ -57,7 +63,7 @@ export const createRating = async (
   });
 
   if (!userBoulder) {
-    throw new Error("You must climb a boulder before rating it");
+    throw new ForbiddenError("You must climb a boulder before rating it");
   }
 
   // Check if user already rated this boulder
@@ -71,7 +77,9 @@ export const createRating = async (
   });
 
   if (existingRating) {
-    throw new Error("You have already rated this boulder. Use update instead.");
+    throw new ConflictError(
+      "You have already rated this boulder. Use update instead.",
+    );
   }
 
   // Create the rating
@@ -249,11 +257,11 @@ export const updateRating = async (
   });
 
   if (!existing) {
-    throw new Error("Rating not found");
+    throw new NotFoundError("Rating not found");
   }
 
   if (existing.userId !== userId) {
-    throw new Error("You can only update your own ratings");
+    throw new ForbiddenError("You can only update your own ratings");
   }
 
   // Update the rating
@@ -289,11 +297,11 @@ export const deleteRating = async (id: string, userId: string) => {
   });
 
   if (!existing) {
-    throw new Error("Rating not found");
+    throw new NotFoundError("Rating not found");
   }
 
   if (existing.userId !== userId) {
-    throw new Error("You can only delete your own ratings");
+    throw new ForbiddenError("You can only delete your own ratings");
   }
 
   const boulderId = existing.boulderId;

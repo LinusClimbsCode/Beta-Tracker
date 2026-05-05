@@ -1,5 +1,6 @@
 import { prisma } from "#db";
 import type { Validation, ValidationStatus } from "#db";
+import { ConflictError, ForbiddenError, NotFoundError } from "#errors";
 
 export const validateBoulder = async (
   data: {
@@ -22,17 +23,19 @@ export const validateBoulder = async (
   });
 
   if (!boulder) {
-    throw new Error("Boulder not found");
+    throw new NotFoundError("Boulder not found");
   }
 
   // 2. Check if boulder is pending (can't validate approved/rejected boulders)
   if (boulder.status !== "pending") {
-    throw new Error(`Cannot validate boulder with status: ${boulder.status}`);
+    throw new ConflictError(
+      `Cannot validate boulder with status: ${boulder.status}`,
+    );
   }
 
   // 3. Check if user is trying to validate their own upload
   if (boulder.uploadedBy.id === userId) {
-    throw new Error("You cannot validate your own boulder");
+    throw new ForbiddenError("You cannot validate your own boulder");
   }
 
   // 3.1 Check if user is the verified setter - if so, auto-approve
@@ -120,7 +123,7 @@ export const validateBoulder = async (
   });
 
   if (existingValidation) {
-    throw new Error("You have already validated this boulder");
+    throw new ConflictError("You have already validated this boulder");
   }
 
   // 5. Get user's validation power and check email verification
@@ -130,11 +133,11 @@ export const validateBoulder = async (
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new NotFoundError("User not found");
   }
 
   if (!user.emailVerified) {
-    throw new Error("Email must be verified to validate boulders");
+    throw new ForbiddenError("Email must be verified to validate boulders");
   }
 
   // 6. Create validation record

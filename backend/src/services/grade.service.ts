@@ -1,21 +1,24 @@
-import { prisma } from '#db'
+import { prisma } from "#db";
+import { ConflictError, NotFoundError } from "#errors";
 
 export const createGrade = async (data: {
-  gymId: string
-  value: string
-  displayOrder: number
+  gymId: string;
+  value: string;
+  displayOrder: number;
 }) => {
   // Check for duplicate value in same gym
   const existingValue = await prisma.grade.findUnique({
     where: {
       gymId_value: {
         gymId: data.gymId,
-        value: data.value
-      }
-    }
-  })
+        value: data.value,
+      },
+    },
+  });
   if (existingValue) {
-    throw new Error('Grade with this value already exists for this gym')
+    throw new ConflictError(
+      "Grade with this value already exists for this gym",
+    );
   }
 
   // Check for duplicate displayOrder in same gym
@@ -23,12 +26,12 @@ export const createGrade = async (data: {
     where: {
       gymId_displayOrder: {
         gymId: data.gymId,
-        displayOrder: data.displayOrder
-      }
-    }
-  })
+        displayOrder: data.displayOrder,
+      },
+    },
+  });
   if (existingOrder) {
-    throw new Error('Display order already exists for this gym')
+    throw new ConflictError("Display order already exists for this gym");
   }
 
   return await prisma.grade.create({
@@ -38,12 +41,12 @@ export const createGrade = async (data: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
-    }
-  })
-}
+          city: true,
+        },
+      },
+    },
+  });
+};
 
 export const findGradeById = async (id: string) => {
   return await prisma.grade.findUnique({
@@ -53,20 +56,18 @@ export const findGradeById = async (id: string) => {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
-    }
-  })
-}
+          city: true,
+        },
+      },
+    },
+  });
+};
 
-export const findAllGrades = async (filters: {
-  gymId?: string
-}) => {
-  const where: any = {}
+export const findAllGrades = async (filters: { gymId?: string }) => {
+  const where: any = {};
 
   if (filters.gymId) {
-    where.gymId = filters.gymId
+    where.gymId = filters.gymId;
   }
 
   return await prisma.grade.findMany({
@@ -76,31 +77,34 @@ export const findAllGrades = async (filters: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
+          city: true,
+        },
+      },
     },
     orderBy: {
-      displayOrder: 'asc'
-    }
-  })
-}
+      displayOrder: "asc",
+    },
+  });
+};
 
-export const updateGrade = async (id: string, data: {
-  gymId?: string
-  value?: string
-  displayOrder?: number
-}) => {
+export const updateGrade = async (
+  id: string,
+  data: {
+    gymId?: string;
+    value?: string;
+    displayOrder?: number;
+  },
+) => {
   // Get current grade to check constraints
   const currentGrade = await prisma.grade.findUnique({
-    where: { id }
-  })
+    where: { id },
+  });
 
   if (!currentGrade) {
-    throw new Error('Grade not found')
+    throw new NotFoundError("Grade not found");
   }
 
-  const gymId = data.gymId || currentGrade.gymId
+  const gymId = data.gymId || currentGrade.gymId;
 
   // Check for duplicate value if updating value
   if (data.value) {
@@ -108,11 +112,13 @@ export const updateGrade = async (id: string, data: {
       where: {
         gymId,
         value: data.value,
-        NOT: { id }
-      }
-    })
+        NOT: { id },
+      },
+    });
     if (existingValue) {
-      throw new Error('Grade with this value already exists for this gym')
+      throw new ConflictError(
+        "Grade with this value already exists for this gym",
+      );
     }
   }
 
@@ -122,11 +128,11 @@ export const updateGrade = async (id: string, data: {
       where: {
         gymId,
         displayOrder: data.displayOrder,
-        NOT: { id }
-      }
-    })
+        NOT: { id },
+      },
+    });
     if (existingOrder) {
-      throw new Error('Display order already exists for this gym')
+      throw new ConflictError("Display order already exists for this gym");
     }
   }
 
@@ -138,15 +144,15 @@ export const updateGrade = async (id: string, data: {
         select: {
           id: true,
           name: true,
-          city: true
-        }
-      }
-    }
-  })
-}
+          city: true,
+        },
+      },
+    },
+  });
+};
 
 export const deleteGrade = async (id: string) => {
   return await prisma.grade.delete({
-    where: { id }
-  })
-}
+    where: { id },
+  });
+};

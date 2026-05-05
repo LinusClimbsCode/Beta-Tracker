@@ -1,5 +1,6 @@
 import { prisma } from "#db";
 import type { Status } from "#db";
+import { ConflictError, ForbiddenError, NotFoundError } from "#errors";
 
 export const createUserBoulder = async (
   data: {
@@ -16,11 +17,11 @@ export const createUserBoulder = async (
   });
 
   if (!user) {
-    throw new Error("User not found");
+    throw new NotFoundError("User not found");
   }
 
   if (!user.emailVerified) {
-    throw new Error("Email must be verified to log boulder attempts");
+    throw new ForbiddenError("Email must be verified to log boulder attempts");
   }
 
   // Check if user already has a record for this boulder
@@ -34,7 +35,7 @@ export const createUserBoulder = async (
   });
 
   if (existing) {
-    throw new Error(
+    throw new ConflictError(
       "You have already logged an attempt for this boulder. Use update instead.",
     );
   }
@@ -45,7 +46,7 @@ export const createUserBoulder = async (
   });
 
   if (!boulder) {
-    throw new Error("Boulder not found");
+    throw new NotFoundError("Boulder not found");
   }
 
   // Create the record
@@ -169,11 +170,11 @@ export const updateUserBoulder = async (
   });
 
   if (!existing) {
-    throw new Error("UserBoulder record not found");
+    throw new NotFoundError("UserBoulder record not found");
   }
 
   if (existing.userId !== userId) {
-    throw new Error("You can only update your own boulder attempts");
+    throw new ForbiddenError("You can only update your own boulder attempts");
   }
 
   const updateData: any = {};
@@ -221,11 +222,11 @@ export const deleteUserBoulder = async (id: string, userId: string) => {
   });
 
   if (!existing) {
-    throw new Error("UserBoulder record not found");
+    throw new NotFoundError("UserBoulder record not found");
   }
 
   if (existing.userId !== userId) {
-    throw new Error("You can only delete your own boulder attempts");
+    throw new ForbiddenError("You can only delete your own boulder attempts");
   }
 
   return await prisma.userBoulder.delete({

@@ -70,10 +70,18 @@ export const updateEventController = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
+  if (!req.user) {
+    res.status(401).json({
+      success: false,
+      message: "No valid User",
+    });
+    return;
+  }
+
   const { id } = req.params;
   const data = req.body;
 
-  const event = await updateEvent(id, data);
+  const event = await updateEvent(id, req.user.id, data);
 
   res.json({
     success: true,
