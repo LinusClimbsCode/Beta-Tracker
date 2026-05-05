@@ -4,6 +4,7 @@ import type { WallWhereInput } from "#generated/prisma/models";
 
 export const createWall = async (data: {
   gymId: string;
+  createdById: string;
   name: string;
   description: string;
   imageUrl: string;

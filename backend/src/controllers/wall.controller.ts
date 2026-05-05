@@ -6,9 +6,13 @@ import {
   updateWall,
   deleteWall,
 } from "#services";
+import { NotFoundError, UnauthorizedError } from "#errors";
 
 export const createWallController = async (req: Request, res: Response) => {
-  const wall = await createWall(req.body);
+  if (!req.user) {
+    throw new UnauthorizedError("Authentication required");
+  }
+  const wall = await createWall({ ...req.body, createdById: req.user.id });
 
   res.status(201).json({
     success: true,
@@ -73,6 +77,9 @@ export const deleteWallController = async (
   req: Request<{ id: string }>,
   res: Response,
 ) => {
+  if (!req.user) {
+    throw new UnauthorizedError("Authentication required");
+  }
   const { id } = req.params;
 
   await deleteWall(id);
