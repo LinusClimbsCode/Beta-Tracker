@@ -1,1 +1,16 @@
 node_modules
+
+# Lockfiles for package managers we don't use (this project uses pnpm)
+package-lock.json
+yarn.lock
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Editor noise
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
