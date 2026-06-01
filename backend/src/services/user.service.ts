@@ -95,27 +95,31 @@ export const updateUser = async (
 };
 
 export const getUserStats = async (id: string) => {
+  // Nutzerdaten + verknüpfte Objekte abfragen (nur `include`)
   const user = await prisma.user.findUnique({
     where: { id },
-    select: {
-      id: true,
-      username: true,
-      name: true,
-      city: true,
-      experiencePoints: true,
-      trustPoints: true,
-      validationPower: true,
-      _count: {
-        select: {
-          uploadedBoulders: true,
-          userBoulders: true,
-          boulderValidations: true,
-        },
-      },
+    include: {
+      userGymRoles: true,
+      userGymStandings: true,
     },
   });
-
   if (!user) throw new NotFoundError("User not found");
-
-  return user;
+  // Anzahlen abfragen (ohne unnötige Null-Prüfungen)
+  const uploadedBouldersCount = await prisma.boulder.count({
+    where: { uploadedById: id }, // Korrigiertes Feld
+  });
+  const userBouldersCount = await prisma.userBoulder.count({
+    where: { userId: id },
+  });
+  const boulderValidationsCount = await prisma.boulderValidation.count({
+    where: { userId: id },
+  });
+  return {
+    user,
+    counts: {
+      uploadedBoulders: uploadedBouldersCount,
+      userBoulders: userBouldersCount,
+      boulderValidations: boulderValidationsCount,
+    },
+  };
 };

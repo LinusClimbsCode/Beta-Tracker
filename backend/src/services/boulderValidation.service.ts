@@ -14,7 +14,8 @@ export const validateBoulder = async (
     where: { id: data.boulderId },
     include: {
       boulderValidations: {
-        include: { user: { select: { id: true, validationPower: true } } },
+        select: { validationPowerUsed: true },
+        include: { user: { select: { id: true } } },
       },
       uploadedBy: {
         select: { id: true },
@@ -86,13 +87,14 @@ export const validateBoulder = async (
         boulderId: data.boulderId,
         userId,
         validation: "approve",
+        // TODO Branch feature/per-gym-trust-services: Derive validationPowerUsed from UserGymStanding.trustPoints
+        validationPowerUsed: 0,
       },
       include: {
         user: {
           select: {
             id: true,
             username: true,
-            validationPower: true,
           },
         },
       },
@@ -126,10 +128,11 @@ export const validateBoulder = async (
     throw new ConflictError("You have already validated this boulder");
   }
 
-  // 5. Get user's validation power and check email verification
+  // 5. Check email verification
+  // TODO: trust logic get add in Branch feature/per-gym-trust-services
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { validationPower: true, emailVerified: true },
+    select: { emailVerified: true },
   });
 
   if (!user) {
@@ -146,13 +149,14 @@ export const validateBoulder = async (
       boulderId: data.boulderId,
       userId,
       validation: data.validation,
+      // TODO Branch feature/per-gym-trust-services: Derive validationPowerUsed from UserGymStanding.trustPoints
+      validationPowerUsed: 0,
     },
     include: {
       user: {
         select: {
           id: true,
           username: true,
-          validationPower: true,
         },
       },
     },
@@ -174,8 +178,9 @@ export const validateBoulder = async (
     if (v.validation === "approve") {
       // Get the validation power of the user who approved (already included in the validation object)
       // TODO BUG boulderValidation v.user always undefined check
-      const validatorPower = v.user?.validationPower || 0;
-      totalApprovalPoints += validatorPower;
+      // TODO Branch feature/per-gym-trust-services: Derive validationPowerUsed from UserGymStanding.trustPoints
+      const validationPower = 0;
+      totalApprovalPoints += validationPower;
     }
   }
 
@@ -262,7 +267,6 @@ export const getBoulderValidations = async (boulderId: string) => {
         select: {
           id: true,
           username: true,
-          validationPower: true,
         },
       },
     },

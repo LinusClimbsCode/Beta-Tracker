@@ -9,7 +9,10 @@ import {
 import { boulderQuerySchema } from "#schemas";
 import type { ValidationStatus } from "#db";
 
-export const createBoulderController = async (req: Request, res: Response) => {
+export const createBoulderController = async (
+  req: Request<{ gymId: string }>,
+  res: Response,
+) => {
   if (!req.user) {
     res.status(401).json({
       success: false,
@@ -17,8 +20,8 @@ export const createBoulderController = async (req: Request, res: Response) => {
     });
     return;
   }
-
-  const boulder = await createBoulder(req.body, req.user.id);
+  const { gymId } = req.params;
+  const boulder = await createBoulder(req.body, req.user.id, gymId);
   res.status(201).json({
     success: true,
     boulder,

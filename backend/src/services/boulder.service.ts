@@ -12,11 +12,22 @@ export const createBoulder = async (
     colorIds: string[];
   },
   uploadedById: string,
+  targetGymId: string,
 ) => {
   // Get uploader to check if they're a setter
   const uploader = await prisma.user.findUnique({
     where: { id: uploadedById },
-    select: { setter: true, trustPoints: true, emailVerified: true },
+    select: {
+      emailVerified: true,
+      userGymStandings: {
+        where: { gymId: targetGymId },
+        select: { trustPoints: true },
+      },
+      userGymRoles: {
+        where: { gymId: targetGymId },
+        select: { role: true },
+      },
+    },
   });
 
   if (!uploader) {
@@ -27,19 +38,30 @@ export const createBoulder = async (
     throw new ForbiddenError("Email must be verified to upload boulders");
   }
 
+  let trustPoints = 0;
+  if (!uploader.userGymStandings[0]) {
+    const newStanding = await prisma.userGymStanding.create({
+      data: { userId: uploadedById, gymId: targetGymId },
+    });
+    trustPoints = newStanding.trustPoints;
+  } else {
+    trustPoints = uploader.userGymStandings[0].trustPoints;
+  }
+
   // Calculate required validation points based on uploader's trust points
   let requiredValidationPoints = 3; // Default: need 3 validations
-  if (uploader.trustPoints >= 100) {
+  if (trustPoints >= 100) {
     requiredValidationPoints = 1;
-  } else if (uploader.trustPoints >= 50) {
+  } else if (trustPoints >= 50) {
     requiredValidationPoints = 2;
   }
 
   // Auto-approve if uploader is a setter
-  const status = uploader.setter ? "approved" : "pending";
-  const currentValidationPoints = uploader.setter
-    ? requiredValidationPoints
-    : 0;
+  const isSetter = uploader.userGymRoles.some(
+    (role) => role.role === "gym_setter",
+  );
+  const status = isSetter ? "approved" : "pending";
+  const currentValidationPoints = isSetter ? requiredValidationPoints : 0;
 
   return await prisma.boulder.create({
     data: {
@@ -104,7 +126,6 @@ export const findBoulderById = async (id: string) => {
         select: {
           id: true,
           username: true,
-          setter: true,
         },
       },
       uploadedBy: {
@@ -134,7 +155,6 @@ export const findAllBoulders = async (filters: {
   uploadedById?: string;
   status?: ValidationStatus;
 }) => {
-  // TODO any, no no no go
   const where: Prisma.BoulderWhereInput = {};
 
   if (filters.wallId) {

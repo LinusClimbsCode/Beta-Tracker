@@ -1,5 +1,6 @@
 import { prisma } from "#db";
 import type { Prisma } from "#db";
+import type { GymType } from "#db";
 import type { GradeSystemType } from "#db";
 
 export const createGym = async (data: Prisma.GymCreateInput) => {
@@ -13,11 +14,9 @@ export const findGymById = async (id: string) => {
     where: { id },
     include: {
       walls: true,
-      moderators: {
+      userGymRoles: {
         include: {
-          moderator: {
-            select: { id: true, username: true },
-          },
+          user: true,
         },
       },
     },
@@ -25,17 +24,7 @@ export const findGymById = async (id: string) => {
 };
 
 export const findAllGyms = async () => {
-  return await prisma.gym.findMany({
-    include: {
-      moderators: {
-        select: {
-          moderator: {
-            select: { id: true, username: true },
-          },
-        },
-      },
-    },
-  });
+  return await prisma.gym.findMany({});
 };
 
 // isActive think about solution if everybody
@@ -44,6 +33,7 @@ export const updateGym = async (
   id: string,
   data: {
     name?: string;
+    type?: GymType;
     city?: string;
     address?: string;
     website?: string;

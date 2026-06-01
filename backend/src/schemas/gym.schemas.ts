@@ -3,6 +3,7 @@ import z from "zod";
 export const createGymSchema = z
   .object({
     name: z.string({ message: "Name must be a string" }).min(2).max(100),
+    type: z.enum(["bouldering", "climbing", "mixed"]),
     address: z.object({
       street: z.string(),
       zipCode: z.string(),
@@ -27,13 +28,20 @@ export const createGymSchema = z
       membership: z.number().optional(),
     }),
     imageUrl: z.url(),
-    gradeSystemType: z.enum(["numeric", "french", "american", "colorBased"]),
+    gradeSystemType: z.enum([
+      "numeric",
+      "french",
+      "american",
+      "colorBased",
+      "uiaa",
+    ]),
   })
   .strict();
 
 export const updateGymSchema = z
   .object({
     name: z.string().min(2).max(100).optional(),
+    type: z.enum(["bouldering", "climbing", "mixed"]),
     address: z
       .object({
         street: z.string(),
@@ -65,7 +73,7 @@ export const updateGymSchema = z
       .optional(),
     imageUrl: z.url().optional(),
     gradeSystemType: z
-      .enum(["numeric", "french", "american", "colorBased"])
+      .enum(["numeric", "french", "american", "colorBased", "uiaa"])
       .optional(),
     isActive: z.boolean().optional(),
   })
