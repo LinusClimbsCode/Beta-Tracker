@@ -5,14 +5,17 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 // ========== ENUM ==========
 enum Role {
   user
-  moderator
   admin
+  gym_admin
+  gym_setter
+  gym_moderator
+  community_moderator
 }
 
 enum Level {
@@ -27,11 +30,18 @@ enum Language {
   en
 }
 
+enum GymType {
+  bouldering
+  climbing
+  mixed
+  }
+
 enum GradeSystemType {
   numeric
   french
   american
   colorBased
+  uiaa
 }
 
 enum WallType {
@@ -94,59 +104,47 @@ enum Validation {
 // ========== MODEL ==========
 // ========== USER & AUTH ==========
 model User {
-  id                  String               @id @default(cuid())
-  username            String               @unique
-  email               String               @unique
-  passwordHash        String
-  name                String
-  surname             String?
-  bio                 String?
-  profilePicture      String?
-  city                String
-  favoriteGymId       String?
-  role                Role                 @default(user)
-  setter              Boolean              @default(false)
-  experiencePoints    Int                  @default(0)
-  level               Level                @default(newbie)
-  trustPoints         Int                  @default(0)
-  validationPower     Int                  @default(0)
-  preferredLanguage   Language             @default(en)
-  darkModeEnabled     Boolean              @default(false)
-  profileVisibility   Boolean              @default(true)
-  emailVerified       Boolean              @default(false)
-  favoriteGym         Gym?                 @relation("favoriteByUsers", fields: [favoriteGymId], references: [id])
-  setBoulders         Boulder[]            @relation("verifiedSetter")
-  uploadedBoulders    Boulder[]            @relation("uploadedBy")
-  moderatorGyms       ModeratorGym[]
-  communityRatings    Rating[]
-  boulderValidations  BoulderValidation[]
-  setterConfirmations SetterConfirmation[]
-  userBoulders        UserBoulder[]
-  userArchives        UserArchive[]
-  events Event[]
-  walls Wall[]
-  createdAt           DateTime             @default(now())
-  updatedAt           DateTime             @updatedAt
-  lastLoginAt         DateTime             @default(now())
-  RefreshToken        RefreshToken[]
-}
-
-model ModeratorGym {
-  id          String   @id @default(cuid())
-  moderatorId String
-  gymId       String
-  moderator   User     @relation(fields: [moderatorId], references: [id])
-  gym         Gym      @relation(fields: [gymId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([moderatorId, gymId])
+  id                 String              @id @default(cuid())
+  username           String              @unique
+  email              String              @unique
+  passwordHash       String
+  name               String
+  surname            String?
+  bio                String?
+  profilePicture     String?
+  city               String
+  favoriteGymId      String?
+  quarantinedUntil   DateTime?
+  role               Role                @default(user)
+  experiencePoints   Int                 @default(0)
+  level              Level               @default(newbie)
+  preferredLanguage  Language            @default(en)
+  darkModeEnabled    Boolean             @default(false)
+  profileVisibility  Boolean             @default(true)
+  emailVerified      Boolean             @default(false)
+  favoriteGym        Gym?                @relation("favoriteByUsers", fields: [favoriteGymId], references: [id])
+  setBoulders        Boulder[]           @relation("verifiedSetter")
+  uploadedBoulders   Boulder[]           @relation("uploadedBy")
+  communityRatings   Rating[]
+  boulderValidations BoulderValidation[]
+  userGymStandings   UserGymStanding[]
+  userGymRoles       UserGymRole[]
+  userBoulders       UserBoulder[]
+  userArchives       UserArchive[]
+  events             Event[]
+  walls              Wall[]
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  lastLoginAt        DateTime            @default(now())
+  RefreshToken       RefreshToken[]
 }
 
 // ========== LOCATION ==========
 model Gym {
-  id               String          @id @default(cuid())
+  id               String            @id @default(cuid())
+  adminUserId      String?
   name             String
+  type             GymType
   address          Json
   city             String
   website          String
@@ -157,14 +155,15 @@ model Gym {
   priceInfo        Json
   imageUrl         String?
   gradeSystemType  GradeSystemType
-  isActive         Boolean         @default(true)
+  isActive         Boolean           @default(true)
   walls            Wall[]
   events           Event[]
-  favoritedByUsers User[]          @relation("favoriteByUsers")
-  moderators       ModeratorGym[]
+  favoritedByUsers User[]            @relation("favoriteByUsers")
+  userGymStandings UserGymStanding[]
+  userGymRoles     UserGymRole[]
   grades           Grade[]
-  createdAt        DateTime        @default(now())
-  updatedAt        DateTime        @updatedAt
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
 
   @@unique([name, city, email])
 }
@@ -180,10 +179,37 @@ model Wall {
   isActive    Boolean
   lastReset   DateTime
   gym         Gym        @relation(fields: [gymId], references: [id])
-  createdBy   User       @relation(fields: [createdById], references: [id]) 
+  createdBy   User       @relation(fields: [createdById], references: [id])
   boulders    Boulder[]
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+}
+
+model UserGymStanding {
+  userId      String
+  gymId       String
+  trustPoints Int    @default(0)
+  user        User   @relation(fields: [userId], references: [id])
+  gym         Gym    @relation(fields: [gymId], references: [id])
+
+  @@unique([userId, gymId])
+}
+
+model UserGymRole {
+  userId         String
+  gymId          String
+  role           Role
+  grantedAt      DateTime  @default(now())
+  grantedBy      String
+  source         String
+  status         String
+  lastActivityAt DateTime?
+  expiresAt      DateTime?
+
+  user User @relation(fields: [userId], references: [id])
+  gym  Gym  @relation(fields: [gymId], references: [id])
+
+  @@unique([userId, gymId, role])
 }
 
 // ========== REFERENCE DATA ==========
@@ -199,7 +225,7 @@ model Color {
 model Event {
   id               String      @id @default(cuid())
   gymId            String
-  createdById            String
+  createdById      String
   title            String
   eventType        EventType[]
   description      String
@@ -210,7 +236,7 @@ model Event {
   registrationLink String
   isActive         Boolean
   gym              Gym         @relation(fields: [gymId], references: [id])
-  createdBy              User         @relation(fields: [createdById], references: [id])
+  createdBy        User        @relation(fields: [createdById], references: [id])
   createdAt        DateTime    @default(now())
   updatedAt        DateTime    @updatedAt
 }
@@ -230,7 +256,7 @@ model Grade {
 
 // ========== BOULDER & VALIDATION ==========
 model Boulder {
-  id                       String               @id @default(cuid())
+  id                       String              @id @default(cuid())
   wallId                   String
   name                     String?
   setGradeId               String
@@ -240,50 +266,39 @@ model Boulder {
   unverifiedSetterName     String?
   uploadedById             String
   status                   ValidationStatus
-  imageUrl         String?
+  imageUrl                 String?
   requiredValidationPoints Int
   currentValidationPoints  Int
-  wall                     Wall                 @relation(fields: [wallId], references: [id])
-  setGrade                 Grade                @relation(fields: [setGradeId], references: [id])
+  wall                     Wall                @relation(fields: [wallId], references: [id])
+  setGrade                 Grade               @relation(fields: [setGradeId], references: [id])
   colors                   Color[]
-  verifiedSetter           User?                @relation("verifiedSetter", fields: [verifiedSetterId], references: [id])
-  uploadedBy               User                 @relation("uploadedBy", fields: [uploadedById], references: [id])
+  verifiedSetter           User?               @relation("verifiedSetter", fields: [verifiedSetterId], references: [id])
+  uploadedBy               User                @relation("uploadedBy", fields: [uploadedById], references: [id])
   communityRatings         Rating[]
   boulderValidations       BoulderValidation[]
-  setterConfirmations      SetterConfirmation[]
   climbedBy                UserBoulder[]
-  createdAt                DateTime             @default(now())
-  updatedAt                DateTime             @updatedAt
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
 }
 
 model BoulderValidation {
-  id         String     @id @default(cuid())
-  boulderId  String
-  userId     String
-  validation Validation
-  boulder    Boulder    @relation(fields: [boulderId], references: [id])
-  user       User       @relation(fields: [userId], references: [id])
-  createdAt  DateTime   @default(now())
-  updatedAt  DateTime   @updatedAt
-
-  @@unique([boulderId, userId])
-}
-
-model SetterConfirmation {
-  id        String   @id @default(cuid())
-  boulderId String
-  userId    String
-  boulder   Boulder  @relation(fields: [boulderId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id                  String     @id @default(cuid())
+  boulderId           String
+  userId              String
+  validation          Validation
+  validationPowerUsed Int
+  rejectReason        String?
+  boulder             Boulder    @relation(fields: [boulderId], references: [id])
+  user                User       @relation(fields: [userId], references: [id])
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
 
   @@unique([boulderId, userId])
 }
 
 // ========== USER INTERACTIONS ==========
 model UserBoulder {
-  id             String   @id @default(cuid())
+  id             String    @id @default(cuid())
   boulderId      String
   userId         String
   status         Status
@@ -291,10 +306,10 @@ model UserBoulder {
   firstAttemptAt DateTime
   completedAt    DateTime?
   xpAwarded      Int
-  boulder        Boulder  @relation(fields: [boulderId], references: [id])
-  user           User     @relation(fields: [userId], references: [id])
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  boulder        Boulder   @relation(fields: [boulderId], references: [id])
+  user           User      @relation(fields: [userId], references: [id])
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   @@unique([boulderId, userId])
 }
@@ -315,15 +330,16 @@ model Rating {
 }
 
 model UserArchive {
-  id                  String            @id @default(cuid())
-  userId              String
-  activityType        ActivityType
-  xpGained            Int
-  relatedEntityType   RelatedEntityType
-  relatedEntityId     String
-  user                User              @relation(fields: [userId], references: [id])
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
+  id                String            @id @default(cuid())
+  userId            String
+  gymId             String?
+  activityType      ActivityType
+  xpGained          Int
+  relatedEntityType RelatedEntityType
+  relatedEntityId   String
+  user              User              @relation(fields: [userId], references: [id])
+  createdAt         DateTime          @default(now())
+  updatedAt         DateTime          @updatedAt
 }
 
 model RefreshToken {
@@ -333,4 +349,19 @@ model RefreshToken {
   expiresAt DateTime
   user      User     @relation(fields: [userId], references: [id])
   createdAt DateTime @default(now())
+}
+
+model SetterPromotion {
+  id String @id
+  // TODO: Add fields later
+}
+
+model SetterPromotionVote {
+  id String @id
+  // TODO: Add fields later
+}
+
+model Report {
+  id String @id
+  // TODO: Add fields later
 }
