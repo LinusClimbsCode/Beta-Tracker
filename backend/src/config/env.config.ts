@@ -1,22 +1,30 @@
-import { z } from 'zod';
-import type { StringValue } from 'ms'
-
+import { z } from "zod";
+import type { StringValue } from "ms";
 
 const envSchema = z.object({
   // JWT Config
-  JWT_ACCESS_SECRET: z.string().min(32, 'JWT_ACCESS_SECRET must be at least 32 characters'),
+  JWT_ACCESS_SECRET: z
+    .string()
+    .min(32, "JWT_ACCESS_SECRET must be at least 32 characters"),
   JWT_REFRESH_SECRET: z.string().min(32),
-  ACCESS_TOKEN_EXPIRY: z.string().default('30m'),
-  REFRESH_TOKEN_EXPIRY: z.string().default('30d'),
+  ACCESS_TOKEN_EXPIRY: z.string().default("30m"),
+  REFRESH_TOKEN_EXPIRY: z.string().default("30d"),
   // Crypto
-  CRYPTO_HASH_ROUNDS: z.string().transform(Number).pipe(z.number().int().positive()).default(11),
+  CRYPTO_HASH_ROUNDS: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().int().positive())
+    .default(11),
 
   // Database
   DATABASE_URL: z.url(),
-  SHADOW_DATABASE_URL: z.url(),
   // Server
-  NODE_ENV: z.enum(['development', 'production']).default('development'),
-  PORT: z.string().transform(Number).pipe(z.number().int().positive()).default(5432),
+  NODE_ENV: z.enum(["development", "production"]).default("development"),
+  PORT: z
+    .string()
+    .transform(Number)
+    .pipe(z.number().int().positive())
+    .default(5432),
   HOST: z.string().default("127.0.0.1"),
   FRONTEND_URL: z.string().url().optional(),
 });
@@ -25,36 +33,35 @@ const envSchema = z.object({
 const parsedEnv = envSchema.safeParse(process.env);
 
 if (!parsedEnv.success) {
-  if (process.env.NODE_ENV === 'development') {
-    console.error('ENV Validation Error:', parsedEnv.error.issues)
+  if (process.env.NODE_ENV === "development") {
+    console.error("ENV Validation Error:", parsedEnv.error.issues);
   }
-  throw new Error('Invalid environment variables');
+  throw new Error("Invalid environment variables");
 }
 
 // type extraction
-type ParsedEnv = z.infer<typeof envSchema>
+type ParsedEnv = z.infer<typeof envSchema>;
 
 type Config = {
   jwt: {
-    accessSecret: ParsedEnv['JWT_ACCESS_SECRET'],
-    refreshSecret: ParsedEnv['JWT_REFRESH_SECRET'],
-    accessExpiry: StringValue,
-    refreshExpiry: StringValue,
-  },
+    accessSecret: ParsedEnv["JWT_ACCESS_SECRET"];
+    refreshSecret: ParsedEnv["JWT_REFRESH_SECRET"];
+    accessExpiry: StringValue;
+    refreshExpiry: StringValue;
+  };
   crypto: {
-    cryptoHashSalt: ParsedEnv['CRYPTO_HASH_ROUNDS'],
-  },
+    cryptoHashSalt: ParsedEnv["CRYPTO_HASH_ROUNDS"];
+  };
   database: {
-    url: ParsedEnv['DATABASE_URL'],
-    shadowUrl: ParsedEnv['SHADOW_DATABASE_URL'],
-  },
+    url: ParsedEnv["DATABASE_URL"];
+  };
   server: {
-    nodeEnv: ParsedEnv['NODE_ENV'],
-    port: ParsedEnv['PORT'],
-    host: ParsedEnv['HOST'],
-    frontendUrl?: ParsedEnv['FRONTEND_URL'],
-  },
-}
+    nodeEnv: ParsedEnv["NODE_ENV"];
+    port: ParsedEnv["PORT"];
+    host: ParsedEnv["HOST"];
+    frontendUrl?: ParsedEnv["FRONTEND_URL"];
+  };
+};
 
 // Export typed config
 export const config: Config = {
@@ -69,7 +76,6 @@ export const config: Config = {
   },
   database: {
     url: parsedEnv.data.DATABASE_URL,
-    shadowUrl: parsedEnv.data.SHADOW_DATABASE_URL,
   },
   server: {
     nodeEnv: parsedEnv.data.NODE_ENV,
@@ -77,4 +83,4 @@ export const config: Config = {
     host: parsedEnv.data.HOST,
     frontendUrl: parsedEnv.data.FRONTEND_URL,
   },
-}
+};
