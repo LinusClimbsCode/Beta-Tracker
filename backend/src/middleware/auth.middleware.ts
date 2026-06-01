@@ -59,8 +59,6 @@ export const requireAdmin = async (
       return;
     }
 
-    // TODO requireModerator is missing
-
     req.user = user;
     next();
   } catch (error) {
