@@ -33,4 +33,8 @@ temp/
 # TypeScript
 *.tsbuildinfo
 
+#Prisma 
 /src/generated/prisma
+
+# generated Prisma client lives in src/generated/prisma
+/generated
